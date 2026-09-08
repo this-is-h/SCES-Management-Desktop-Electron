@@ -5,10 +5,10 @@
 
 ## 需要的 Secrets（仓库 Settings → Secrets and variables → Actions）
 
-| Secret | 用途 | 是否必填 |
-|--------|------|---------|
-| 无 | 若 web 预览版走 Vercel **Git 集成**（推荐），latest.json 提交后 Vercel 自动部署，**无需 VERCEL_TOKEN** | — |
-| `VERCEL_TOKEN`（可选） | 若改用 `vercel deploy` CLI 直接部署，需 `VERCEL_ORG_ID` + `VERCEL_PROJECT_ID` | 仅用 CLI 部署时 |
+| Secret                 | 用途                                                                                                   | 是否必填        |
+| ---------------------- | ------------------------------------------------------------------------------------------------------ | --------------- |
+| 无                     | 若 web 预览版走 Vercel **Git 集成**（推荐），latest.json 提交后 Vercel 自动部署，**无需 VERCEL_TOKEN** | —               |
+| `VERCEL_TOKEN`（可选） | 若改用 `vercel deploy` CLI 直接部署，需 `VERCEL_ORG_ID` + `VERCEL_PROJECT_ID`                          | 仅用 CLI 部署时 |
 
 > 说明：当前 workflow 采用「提交 latest.json 到 web/ → Vercel git 集成自动部署」，
 > 复用现有 web 预览版项目与未备案域名，**零新增密钥**。安装包本体存 GitHub Release
@@ -17,11 +17,13 @@
 ## 配置点（发布前检查）
 
 1. **`deploy/profile.json` → `management.updateUrl`**：管理端主进程 `updater.ts` 拉取的检查地址。
-   
+
    当前值：`https://dms.thisish.cn/updates/latest.json`（已配置，无需改）。
+
 2. **`web/public/download.html`**：下载页里 `ghUrl` / `mirrorPrefix` 两常量，改为真实仓库
-   
-   `https://github.com/this-is-h/Dys-Management-System`（当前已是）。
+
+   `https://github.com/this-is-h/SCES-Management-Desktop-Electron`（当前已是）。
+
 3. **版本号**：`management/desktop/package.json` 的 `version`（当前 `0.1.0`）与 git tag 保持一致（CI 生成 latest.json 时读取它）。
 
 ## 本地生成元数据（不改仓库也能预览）

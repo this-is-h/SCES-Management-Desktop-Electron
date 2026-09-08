@@ -55,14 +55,14 @@ jobs:
         # version 取仓库根 package.json；输出到 dist-update/latest.json。
         run: node scripts/gen-update-manifest.mjs
 
-      - name: 推送 latest.json 到 SCES-Web-Vercel（触发 Vercel 自动部署）
+      - name: 推送 latest.json 到 SCES-Server（版本元数据仓库）
         # SCES-Web-Vercel 是独立仓库，Vercel git 集成绑定它的 main 分支；
         # latest.json 必须落在 SCES-Web-Vercel 的 main 才能触发部署。
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git clone --depth 1 "https://x-access-token:${SCES_CI_TOKEN}@github.com/this-is-h/SCES-Web-Vercel.git" web-repo
-          cp dist-update/latest.json web-repo/public/updates/latest.json
+          git clone --depth 1 "https://x-access-token:${SCES_CI_TOKEN}@github.com/this-is-h/SCES-Server.git" web-repo
+          cp dist-update/latest.json web-repo/updates/latest.json
           cd web-repo
           git add public/updates/latest.json
           if git diff --cached --quiet; then
