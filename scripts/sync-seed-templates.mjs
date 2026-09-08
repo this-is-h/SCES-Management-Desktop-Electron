@@ -25,7 +25,7 @@ import { fileURLToPath } from 'node:url'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 // 契约种子经 @sces/contracts 包（git 依赖）引入，见根 package.json devDependencies；
-// 本地开发用 ../sces-server/contracts 的 file: 依赖（pnpm 软链到 node_modules）。
+// 本地开发用 ../SCES-Server/contracts 的 file: 依赖（pnpm 软链到 node_modules）。
 const SRC = path.join(ROOT, 'node_modules', '@sces', 'contracts', 'seed')
 const DST = path.join(ROOT, 'resources', 'templates')
 

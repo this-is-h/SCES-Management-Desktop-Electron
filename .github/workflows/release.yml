@@ -23,7 +23,7 @@ jobs:
           # Release 说明生成需要 tag 区间。
           fetch-depth: 0
 
-      - name: 配置私有依赖认证（@sces/shared / @sces/contracts git 依赖 + sces-web 推送）
+      - name: 配置私有依赖认证（@sces/shared / @sces/contracts git 依赖 + SCES-Web-Vercel 推送）
         run: git config --global url."https://x-access-token:${SCES_CI_TOKEN}@github.com/".insteadOf "https://github.com/"
         env:
           SCES_CI_TOKEN: ${{ secrets.SCES_CI_TOKEN }}
@@ -55,13 +55,13 @@ jobs:
         # version 取仓库根 package.json；输出到 dist-update/latest.json。
         run: node scripts/gen-update-manifest.mjs
 
-      - name: 推送 latest.json 到 sces-web（触发 Vercel 自动部署）
-        # sces-web 是独立仓库，Vercel git 集成绑定它的 main 分支；
-        # latest.json 必须落在 sces-web 的 main 才能触发部署。
+      - name: 推送 latest.json 到 SCES-Web-Vercel（触发 Vercel 自动部署）
+        # SCES-Web-Vercel 是独立仓库，Vercel git 集成绑定它的 main 分支；
+        # latest.json 必须落在 SCES-Web-Vercel 的 main 才能触发部署。
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git clone --depth 1 "https://x-access-token:${SCES_CI_TOKEN}@github.com/this-is-h/sces-web.git" web-repo
+          git clone --depth 1 "https://x-access-token:${SCES_CI_TOKEN}@github.com/this-is-h/SCES-Web-Vercel.git" web-repo
           cp dist-update/latest.json web-repo/public/updates/latest.json
           cd web-repo
           git add public/updates/latest.json

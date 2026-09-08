@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
- * 生成自动更新元数据 latest.json（Vercel 静态托管，随 sces-web 一起部署）。
+ * 生成自动更新元数据 latest.json（Vercel 静态托管，随 SCES-Web-Vercel 一起部署）。
  *
  * 职责：
  *   读取仓库根 package.json 的 version + deploy/profile.json 的 profileId，
- *   写 dist-update/latest.json（跨仓推送由 release.yml 负责：克隆 sces-web，
+ *   写 dist-update/latest.json（跨仓推送由 release.yml 负责：克隆 SCES-Web-Vercel，
  *   覆盖 public/updates/latest.json 后 push main，触发 Vercel 自动部署）。
  *
  * 输出：dist-update/latest.json
@@ -25,7 +25,7 @@ const OUT_FILE = join(process.env.UPDATE_MANIFEST_OUT ?? join(ROOT, 'dist-update
 
 const argv = process.argv.slice(2)
 
-/** 下载页地址：sces-web 部署域下的 /download。 */
+/** 下载页地址：SCES-Web-Vercel 部署域下的 /download。 */
 const DEFAULT_DOWNLOAD_URL = process.env.UPDATE_DOWNLOAD_URL ?? 'https://dms.thisish.cn/download'
 
 const pkg = JSON.parse(readFileSync(PKG_PATH, 'utf8'))

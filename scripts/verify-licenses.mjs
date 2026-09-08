@@ -23,8 +23,8 @@ import { fileURLToPath } from 'node:url'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const NOTICES = join(ROOT, 'THIRD_PARTY_NOTICES.md')
-// 小程序通知副本已随仓库拆分迁至 sces-user（miniprogram/THIRD_PARTY_NOTICES.md），
-// 由 sces-user 侧自持，本仓不再同步。
+// 小程序通知副本已随仓库拆分迁至 SCES-User-Wechat（miniprogram/THIRD_PARTY_NOTICES.md），
+// 由 SCES-User-Wechat 侧自持，本仓不再同步。
 const SYNC = process.argv.includes('--sync')
 
 /** 常规许可白名单（可直接分发，无需 in-doc 全文标记）。 */
@@ -145,7 +145,7 @@ function main() {
     failures.push(`依赖 ${key} 许可「${p.license}」不在白名单：请在 scripts/verify-licenses.mjs 显式处置（新增白名单 / 通知标记 / 豁免说明）`)
   }
 
-  // 小程序通知副本（sces-user/miniprogram/THIRD_PARTY_NOTICES.md）由 sces-user 自持，不再在本仓校验
+  // 小程序通知副本（SCES-User-Wechat/miniprogram/THIRD_PARTY_NOTICES.md）由 SCES-User-Wechat 自持，不再在本仓校验
 
   if (failures.length) {
     console.error(`✘ 许可校验失败（${failures.length} 项）：`)

@@ -9,7 +9,7 @@
  *   输入：deploy/profile.json + deploy/profile.schema.json
  *   输出：无（纯校验；--check 供 CI 比对，--apply 供构建链调用）
  *   不负责：编译、打包、学生端注入（学生端 runtime/active 注入脚本已随仓库拆分
- *   移至 sces-user，在线化（M5）后由服务端下发配置替代）
+ *   移至 SCES-User-Wechat，在线化（M5）后由服务端下发配置替代）
  *
  * 用法：
  *   node scripts/build-profile.mjs --apply   # 校验（构建链前置门禁）

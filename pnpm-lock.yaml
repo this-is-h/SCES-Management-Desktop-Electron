@@ -18,8 +18,8 @@ importers:
         specifier: ^4.0.0
         version: 4.0.0(electron@39.8.10)
       '@sces/shared':
-        specifier: file:../sces-shared
-        version: file:../sces-shared
+        specifier: file:../SCES-Shared
+        version: file:../SCES-Shared
       '@tanstack/vue-table':
         specifier: ^8.21.3
         version: 8.21.3(vue@3.5.42(typescript@5.9.3))
@@ -61,8 +61,8 @@ importers:
         specifier: ^4.10.0
         version: 4.11.1(e22358843f259dcae4375c0b361624b1)
       '@sces/contracts':
-        specifier: file:../sces-server/contracts
-        version: file:../sces-server/contracts
+        specifier: file:../SCES-Server/contracts
+        version: file:../SCES-Server/contracts
       '@types/better-sqlite3':
         specifier: ^7.6.13
         version: 7.6.13
@@ -1201,12 +1201,12 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@sces/contracts@file:../sces-server/contracts':
-    resolution: {directory: ../sces-server/contracts, type: directory}
+  '@sces/contracts@file:../SCES-Server/contracts':
+    resolution: {directory: ../SCES-Server/contracts, type: directory}
     engines: {node: '>=22.12.0'}
 
-  '@sces/shared@file:../sces-shared':
-    resolution: {directory: ../sces-shared, type: directory}
+  '@sces/shared@file:../SCES-Shared':
+    resolution: {directory: ../SCES-Shared, type: directory}
     engines: {node: '>=20.19.0'}
 
   '@sindresorhus/is@4.6.0':
@@ -5666,9 +5666,9 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.63.1':
     optional: true
 
-  '@sces/contracts@file:../sces-server/contracts': {}
+  '@sces/contracts@file:../SCES-Server/contracts': {}
 
-  '@sces/shared@file:../sces-shared': {}
+  '@sces/shared@file:../SCES-Shared': {}
 
   '@sindresorhus/is@4.6.0': {}
 
