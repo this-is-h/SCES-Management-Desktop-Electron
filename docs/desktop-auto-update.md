@@ -18,7 +18,7 @@
 
 1. **`deploy/profile.json` → `management.updateUrl`**：管理端主进程 `updater.ts` 拉取的检查地址。
 
-   当前值：`https://dms.thisish.cn/updates/latest.json`（已配置，无需改）。
+   当前值：`https://sces.thisish.cn/updates/latest.json`（已配置，无需改）。
 
 2. **`web/public/download.html`**：下载页里 `ghUrl` / `mirrorPrefix` 两常量，改为真实仓库
 

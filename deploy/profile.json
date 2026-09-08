@@ -2,7 +2,7 @@
   "profileId": "online-2026s1",
   "mode": "online",
   "management": {
-    "serverUrl": "https://api.dms.example.com",
+    "serverUrl": "https://api.sces.thisish.cn",
     "allowDevServerOverride": true,
     "licenseVerifyKeys": [
       {
@@ -18,10 +18,10 @@
       "enabled": true,
       "toleranceMs": 86400000
     },
-    "updateUrl": "https://dms.thisish.cn/updates/latest.json"
+    "updateUrl": "https://sces.thisish.cn/updates/latest.json"
   },
   "student": {
-    "serverBaseUrl": "https://api.dms.example.com",
+    "serverBaseUrl": "https://api.sces.thisish.cn",
     "offlineUnits": [],
     "localVault": {
       "enabled": true,

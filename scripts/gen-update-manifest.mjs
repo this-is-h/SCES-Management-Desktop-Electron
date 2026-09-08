@@ -26,7 +26,7 @@ const OUT_FILE = join(process.env.UPDATE_MANIFEST_OUT ?? join(ROOT, 'dist-update
 const argv = process.argv.slice(2)
 
 /** 下载页地址：SCES-Web-Vercel 部署域下的 /download。 */
-const DEFAULT_DOWNLOAD_URL = process.env.UPDATE_DOWNLOAD_URL ?? 'https://dms.thisish.cn/download'
+const DEFAULT_DOWNLOAD_URL = process.env.UPDATE_DOWNLOAD_URL ?? 'https://sces.thisish.cn/download'
 
 const pkg = JSON.parse(readFileSync(PKG_PATH, 'utf8'))
 const version = argv[0] ?? pkg.version ?? '0.0.0'
