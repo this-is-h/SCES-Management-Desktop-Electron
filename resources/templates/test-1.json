@@ -15,11 +15,7 @@
     }
   },
   "class": {
-    "titles": [
-      "学院",
-      "专业",
-      "班级"
-    ],
+    "titles": ["学院", "专业", "班级"],
     "options": [
       {
         "text": "测试学院",
@@ -254,10 +250,9 @@
                 "code": "321",
                 "description": "参加志愿服务活动，按服务时长记分。",
                 "scoreType": {
-                  "type": "stepper",
+                  "type": "input",
                   "min": 0,
                   "max": 6,
-                  "step": 0.1,
                   "decimals": 1
                 },
                 "support": {

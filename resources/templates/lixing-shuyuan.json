@@ -15,11 +15,7 @@
     }
   },
   "class": {
-    "titles": [
-      "学院",
-      "专业",
-      "班级"
-    ],
+    "titles": ["学院", "专业", "班级"],
     "options": [
       {
         "text": "生命科学学院",
@@ -938,8 +934,8 @@
                   "type": "stepper",
                   "min": 0,
                   "max": 8,
-                  "step": 2,
-                  "decimals": 0
+                  "step": 0.5,
+                  "decimals": 1
                 },
                 "support": {
                   "need": true,
@@ -1902,8 +1898,8 @@
                   "type": "stepper",
                   "min": 0,
                   "max": 5,
-                  "step": 1,
-                  "decimals": 0
+                  "step": 0.5,
+                  "decimals": 1
                 },
                 "support": {
                   "need": true,

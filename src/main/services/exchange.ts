@@ -103,7 +103,11 @@ async function readExchangeHeaderFromFile(filePath: string): Promise<{
     prefix.copy(headerData)
     const rest = await handle.read(headerData, prefix.length, headerLength, prefix.length)
     if (rest.bytesRead !== headerLength) throw new Error('DYF 文件头部不完整')
-    return { header: readDyfContainerHeader(headerData), frameOffset: prefix.length + headerLength, size: stats.size }
+    return {
+      header: readDyfContainerHeader(headerData),
+      frameOffset: prefix.length + headerLength,
+      size: stats.size
+    }
   } finally {
     await handle.close()
   }
@@ -156,7 +160,12 @@ function validateExchangePayload(
 ): payload is ExchangePayload {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return false
   const p = payload as Partial<ExchangePayload>
-  if (p.documentType !== 'admin-exchange' || p.exchangeVersion !== EXCHANGE_SCHEMA_VERSION || p.batchId !== batch.batchId) return false
+  if (
+    p.documentType !== 'admin-exchange' ||
+    p.exchangeVersion !== EXCHANGE_SCHEMA_VERSION ||
+    p.batchId !== batch.batchId
+  )
+    return false
   if (p.year !== batch.year || p.semester !== batch.semester) return false
   if (!['level2', 'level3'].includes(String(p.fromRole ?? ''))) return false
   if (!p.fromScope || typeof p.fromScope !== 'object' || Array.isArray(p.fromScope)) return false
@@ -252,8 +261,11 @@ function validateExchangePayload(
       if (score.evidenceRefs !== undefined) {
         if (
           !Array.isArray(score.evidenceRefs) ||
-          score.evidenceRefs.some((ref) => typeof ref !== 'string' || !/^sha256:[0-9a-f]{64}$/.test(ref))
-        ) return false
+          score.evidenceRefs.some(
+            (ref) => typeof ref !== 'string' || !/^sha256:[0-9a-f]{64}$/.test(ref)
+          )
+        )
+          return false
       }
       itemCodes.add(score.itemCode)
     }
@@ -261,14 +273,24 @@ function validateExchangePayload(
       if (typeof apply.confirmSlip !== 'string') return false
       if (!apply.confirmSlip || !isBase64(apply.confirmSlip)) return false
     }
-    if (apply.confirmSlipRef !== undefined &&
-      (typeof apply.confirmSlipRef !== 'string' || !/^sha256:[0-9a-f]{64}$/.test(apply.confirmSlipRef))) return false
+    if (
+      apply.confirmSlipRef !== undefined &&
+      (typeof apply.confirmSlipRef !== 'string' ||
+        !/^sha256:[0-9a-f]{64}$/.test(apply.confirmSlipRef))
+    )
+      return false
     if (apply.timeline !== undefined) {
       if (!Array.isArray(apply.timeline)) return false
       for (const event of apply.timeline) {
-        if (!event || typeof event.eventId !== 'string' || !event.eventId ||
+        if (
+          !event ||
+          typeof event.eventId !== 'string' ||
+          !event.eventId ||
           !['student', 'admin', 'system'].includes(event.actorType) ||
-          typeof event.action !== 'string' || !Number.isFinite(event.occurredAt)) return false
+          typeof event.action !== 'string' ||
+          !Number.isFinite(event.occurredAt)
+        )
+          return false
       }
     }
   }
@@ -288,7 +310,8 @@ function validateExchangePayload(
         typeof asset.size !== 'number' ||
         !Number.isInteger(asset.size) ||
         asset.size < 1
-      ) return false
+      )
+        return false
       assetIds.add(asset.assetId)
     }
   }
@@ -320,8 +343,17 @@ export interface ExchangePayload {
 function resolveExchangeAssetFile(
   payload: ExchangePayload,
   ref: string,
-  assets: Map<string, { path: string; descriptor: { assetId: string; sha256: string; mimeType: string; size: number } }>
-): { path: string; descriptor: { assetId: string; sha256: string; mimeType: string; size: number } } {
+  assets: Map<
+    string,
+    {
+      path: string
+      descriptor: { assetId: string; sha256: string; mimeType: string; size: number }
+    }
+  >
+): {
+  path: string
+  descriptor: { assetId: string; sha256: string; mimeType: string; size: number }
+} {
   const descriptor = (payload.assets ?? []).find((item) => item.assetId === ref)
   const asset = assets.get(ref)
   if (!descriptor || !asset) throw new Error(`交换文件缺少证明材料正文 ${ref}`)
@@ -381,7 +413,10 @@ async function streamBatchExchange(
      FROM timeline_event WHERE apply_id = ? ORDER BY occurred_at, event_id`
   )
   // 仅保留去重后的资产元数据；正文在加密写出阶段按块读取，避免把整个班级的图片留在内存。
-  const assets = new Map<string, { assetId: string; sha256: string; mimeType: string; size: number; sourcePath: string }>()
+  const assets = new Map<
+    string,
+    { assetId: string; sha256: string; mimeType: string; size: number; sourcePath: string }
+  >()
   const readEvidenceAsset = async (path: string): Promise<string> => {
     const digest = await hashEvidencePath(path)
     const sha256 = digest.sha256
@@ -400,115 +435,119 @@ async function streamBatchExchange(
   let manifestPath = ''
   let manifestStream!: ReturnType<typeof createWriteStream>
   try {
-  manifestPath = join(tmpdir(), `dms-dyf-manifest-${randomUUID()}.json`)
-  manifestStream = createWriteStream(manifestPath, { flags: 'wx' })
-  const manifestHash = createHash('sha256')
-  let manifestSize = 0
-  let manifestError: Error | null = null
-  manifestStream.on('error', (error) => {
-    manifestError = error instanceof Error ? error : new Error(String(error))
-  })
-  const writeManifestText = async (value: string): Promise<void> => {
-    if (manifestError) throw manifestError
-    const bytes = Buffer.from(value, 'utf8')
-    manifestHash.update(bytes)
-    manifestSize += bytes.length
-    if (!manifestStream.write(bytes)) {
-      await once(manifestStream, 'drain')
+    manifestPath = join(tmpdir(), `dms-dyf-manifest-${randomUUID()}.json`)
+    manifestStream = createWriteStream(manifestPath, { flags: 'wx' })
+    const manifestHash = createHash('sha256')
+    let manifestSize = 0
+    let manifestError: Error | null = null
+    manifestStream.on('error', (error) => {
+      manifestError = error instanceof Error ? error : new Error(String(error))
+    })
+    const writeManifestText = async (value: string): Promise<void> => {
       if (manifestError) throw manifestError
-    }
-  }
-  const scope = currentScope()
-  const exportedAt = Date.now()
-  await writeManifestText(
-    JSON.stringify({
-      documentType: 'admin-exchange',
-      exchangeVersion: EXCHANGE_SCHEMA_VERSION,
-      batchId: batch.batchId,
-      year: batch.year,
-      semester: batch.semester,
-      fromRole: role,
-      fromScope: scope,
-      exportedAt
-    }).replace(/}\s*$/, '') + ',"students":['
-  )
-  let firstStudent = true
-  let studentCount = 0
-  for (const student of studentRows) {
-    await writeManifestText(`${firstStudent ? '' : ','}${JSON.stringify(student)}`)
-    firstStudent = false
-    studentCount++
-  }
-  if (studentCount === 0) throw new Error('鏈寖鍥存殏鏃犲鐢熸暟鎹彲瀵煎嚭')
-  await writeManifestText(',"applies":[')
-  let firstApply = true
-  for (const a of applyRows) {
-    const scores: ExchangeScore[] = []
-    for (const r of scoreStmt.all(a.applyId) as Array<Record<string, unknown>>) {
-      const evidencePaths = (r.evidenceFiles as string | null) ?? ''
-      const evidenceRefs: string[] = []
-      for (const p of JSON.parse(evidencePaths) as string[]) {
-        evidenceRefs.push(await readEvidenceAsset(p))
+      const bytes = Buffer.from(value, 'utf8')
+      manifestHash.update(bytes)
+      manifestSize += bytes.length
+      if (!manifestStream.write(bytes)) {
+        await once(manifestStream, 'drain')
+        if (manifestError) throw manifestError
       }
-      scores.push({
-        itemCode: r.itemCode as string,
-        category: r.category as string,
-        appliedScore: r.appliedScore as number,
-        finalScore: (r.finalScore as number | null) ?? null,
-        maxScore: (r.maxScore as number | null) ?? null,
-        allowAdd: r.allowAdd === 1,
-        ...(evidenceRefs.length ? { evidenceRefs } : {})
-      })
     }
-    const timeline = (timelineStmt.all(a.applyId) as Array<Record<string, unknown>>).map((event): NonNullable<ExchangeApply['timeline']>[number] => ({
-      eventId: event.eventId as string,
-      actorType: event.actorType as 'student' | 'admin' | 'system',
-      role: (event.role as string | null) ?? undefined,
-      action: event.action as string,
-      occurredAt: event.occurredAt as number,
-      revision: (event.revision as number | null) ?? undefined,
-      sourceFileHash: (event.sourceFileHash as string | null) ?? undefined,
-      detail: event.detailJson ? JSON.parse(event.detailJson as string) : undefined
-    }))
-    const applyRecord: ExchangeApply = {
-      applyId: a.applyId,
-      studentId: a.studentId,
-      status: a.status,
-      currentRevision: a.currentRevision,
-      ...(a.confirmSlip ? { confirmSlipRef: await readEvidenceAsset(a.confirmSlip) } : {}),
-      scores,
-      ...(timeline.length ? { timeline } : {})
+    const scope = currentScope()
+    const exportedAt = Date.now()
+    await writeManifestText(
+      JSON.stringify({
+        documentType: 'admin-exchange',
+        exchangeVersion: EXCHANGE_SCHEMA_VERSION,
+        batchId: batch.batchId,
+        year: batch.year,
+        semester: batch.semester,
+        fromRole: role,
+        fromScope: scope,
+        exportedAt
+      }).replace(/}\s*$/, '') + ',"students":['
+    )
+    let firstStudent = true
+    let studentCount = 0
+    for (const student of studentRows) {
+      await writeManifestText(`${firstStudent ? '' : ','}${JSON.stringify(student)}`)
+      firstStudent = false
+      studentCount++
     }
-    await writeManifestText(`${firstApply ? '' : ','}${JSON.stringify(applyRecord)}`)
-    firstApply = false
-  }
+    if (studentCount === 0) throw new Error('鏈寖鍥存殏鏃犲鐢熸暟鎹彲瀵煎嚭')
+    await writeManifestText(',"applies":[')
+    let firstApply = true
+    for (const a of applyRows) {
+      const scores: ExchangeScore[] = []
+      for (const r of scoreStmt.all(a.applyId) as Array<Record<string, unknown>>) {
+        const evidencePaths = (r.evidenceFiles as string | null) ?? ''
+        const evidenceRefs: string[] = []
+        for (const p of JSON.parse(evidencePaths) as string[]) {
+          evidenceRefs.push(await readEvidenceAsset(p))
+        }
+        scores.push({
+          itemCode: r.itemCode as string,
+          category: r.category as string,
+          appliedScore: r.appliedScore as number,
+          finalScore: (r.finalScore as number | null) ?? null,
+          maxScore: (r.maxScore as number | null) ?? null,
+          allowAdd: r.allowAdd === 1,
+          ...(evidenceRefs.length ? { evidenceRefs } : {})
+        })
+      }
+      const timeline = (timelineStmt.all(a.applyId) as Array<Record<string, unknown>>).map(
+        (event): NonNullable<ExchangeApply['timeline']>[number] => ({
+          eventId: event.eventId as string,
+          actorType: event.actorType as 'student' | 'admin' | 'system',
+          role: (event.role as string | null) ?? undefined,
+          action: event.action as string,
+          occurredAt: event.occurredAt as number,
+          revision: (event.revision as number | null) ?? undefined,
+          sourceFileHash: (event.sourceFileHash as string | null) ?? undefined,
+          detail: event.detailJson ? JSON.parse(event.detailJson as string) : undefined
+        })
+      )
+      const applyRecord: ExchangeApply = {
+        applyId: a.applyId,
+        studentId: a.studentId,
+        status: a.status,
+        currentRevision: a.currentRevision,
+        ...(a.confirmSlip ? { confirmSlipRef: await readEvidenceAsset(a.confirmSlip) } : {}),
+        scores,
+        ...(timeline.length ? { timeline } : {})
+      }
+      await writeManifestText(`${firstApply ? '' : ','}${JSON.stringify(applyRecord)}`)
+      firstApply = false
+    }
 
-  const assetDescriptors = Array.from(assets.values()).map(({ assetId, sha256, mimeType, size }) => ({
-    assetId,
-    sha256,
-    mimeType,
-    size
-  }))
-  const assetHashers = new Map<string, ReturnType<typeof createHash>>()
-  await writeManifestText(`],"assets":${JSON.stringify(assetDescriptors)}}`)
-  await new Promise<void>((resolve, reject) => {
-    if (manifestError) return reject(manifestError)
-    manifestStream.once('error', reject)
-    manifestStream.end(() => resolve())
-  })
+    const assetDescriptors = Array.from(assets.values()).map(
+      ({ assetId, sha256, mimeType, size }) => ({
+        assetId,
+        sha256,
+        mimeType,
+        size
+      })
+    )
+    const assetHashers = new Map<string, ReturnType<typeof createHash>>()
+    await writeManifestText(`],"assets":${JSON.stringify(assetDescriptors)}}`)
+    await new Promise<void>((resolve, reject) => {
+      if (manifestError) return reject(manifestError)
+      manifestStream.once('error', reject)
+      manifestStream.end(() => resolve())
+    })
     const manifestSource = {
-    size: manifestSize,
-    contentHash: manifestHash.digest('hex'),
-    readChunk: async (offset: number, maxBytes: number): Promise<Uint8Array> => {
-      const handle = await openFile(manifestPath, 'r')
-      try {
-        const buffer = Buffer.allocUnsafe(maxBytes)
-        const result = await handle.read(buffer, 0, maxBytes, offset)
-        return buffer.subarray(0, result.bytesRead)
-      } finally {
-        await handle.close()
+      size: manifestSize,
+      contentHash: manifestHash.digest('hex'),
+      readChunk: async (offset: number, maxBytes: number): Promise<Uint8Array> => {
+        const handle = await openFile(manifestPath, 'r')
+        try {
+          const buffer = Buffer.allocUnsafe(maxBytes)
+          const result = await handle.read(buffer, 0, maxBytes, offset)
+          return buffer.subarray(0, result.bytesRead)
+        } finally {
+          await handle.close()
+        }
       }
-    }
     }
     const result = await encryptDyfContainerToSink({
       manifest: manifestSource,
@@ -560,7 +599,7 @@ async function streamBatchExchange(
       frameCount: result.frameCount,
       writtenBytes: result.writtenBytes
     }
-  finally {
+  } finally {
     if (manifestStream && !manifestStream.destroyed) manifestStream.destroy()
     await rm(manifestPath, { force: true })
   }
@@ -586,10 +625,7 @@ export async function exportBatchExchangeToFile(
         const buffer = Buffer.from(chunk)
         fileHash.update(buffer)
         if (!output.write(buffer)) {
-          await Promise.race([
-            once(output, 'drain'),
-            once(output, 'error').then(() => undefined)
-          ])
+          await Promise.race([once(output, 'drain'), once(output, 'error').then(() => undefined)])
           if (streamError) throw streamError
         }
       },
@@ -673,7 +709,14 @@ export async function importBatchExchange(
 ): Promise<ImportFileResult[]> {
   const fileName = basename(filePath)
   if (filePath.toLowerCase().endsWith('.dxy')) {
-    return [{ fileName, ok: false, decision: 'error', reason: '旧 .dxy 文件格式已停用，请导出新的 .dyf 文件' }]
+    return [
+      {
+        fileName,
+        ok: false,
+        decision: 'error',
+        reason: '旧 .dxy 文件格式已停用，请导出新的 .dyf 文件'
+      }
+    ]
   }
   let header: ReturnType<typeof readDyfContainerHeader>
   let frameOffset = 0
@@ -716,7 +759,13 @@ export async function importBatchExchange(
   let payload: ExchangePayload
   const exchangeAssetDir = join(evidenceBaseDir(), '.staging', `exchange-${randomUUID()}`)
   mkdirSync(exchangeAssetDir, { recursive: true })
-  const exchangeAssets = new Map<string, { path: string; descriptor: { assetId: string; sha256: string; mimeType: string; size: number } }>()
+  const exchangeAssets = new Map<
+    string,
+    {
+      path: string
+      descriptor: { assetId: string; sha256: string; mimeType: string; size: number }
+    }
+  >()
   const exchangeAssetHandles = new Map<number, Awaited<ReturnType<typeof openFile>>>()
   const exchangeAssetHashes = new Map<number, ReturnType<typeof createHash>>()
   const cleanupExchangeAssets = async (): Promise<void> => {
@@ -755,7 +804,12 @@ export async function importBatchExchange(
         if (!target) {
           target = {
             path: join(exchangeAssetDir, `${assetIndex}-${asset.sha256}.part`),
-            descriptor: { assetId: asset.assetId, sha256: asset.sha256, mimeType: asset.mimeType, size: asset.size }
+            descriptor: {
+              assetId: asset.assetId,
+              sha256: asset.sha256,
+              mimeType: asset.mimeType,
+              size: asset.size
+            }
           }
           exchangeAssets.set(asset.assetId, target)
         }
@@ -772,7 +826,8 @@ export async function importBatchExchange(
         const handle = exchangeAssetHandles.get(assetIndex)
         if (handle) await handle.close()
         const hash = exchangeAssetHashes.get(assetIndex)
-        if (!hash || hash.digest('hex') !== asset.sha256) throw new Error(`DYF 资产完整性校验失败：${asset.assetId}`)
+        if (!hash || hash.digest('hex') !== asset.sha256)
+          throw new Error(`DYF 资产完整性校验失败：${asset.assetId}`)
       }
     })
     await sourceHandle.close()
@@ -830,7 +885,11 @@ export async function importBatchExchange(
   /** 覆盖导入被替换的旧 apply 的证据目录（相对账号目录），事务提交成功后清理孤儿。 */
   const orphanEvidenceRelDirs: string[] = []
 
-  const stageExchangeAssetRefs = (stage: EvidenceStage, itemCode: string, refs: string[]): string[] =>
+  const stageExchangeAssetRefs = (
+    stage: EvidenceStage,
+    itemCode: string,
+    refs: string[]
+  ): string[] =>
     refs.map((ref, index) => {
       const asset = resolveExchangeAssetFile(payload, ref, exchangeAssets)
       return stageEvidenceAssetFile(
@@ -853,7 +912,7 @@ export async function importBatchExchange(
     let studentDbId: number
     if (existing) {
       // 覆盖导入只在 incoming 明确携带申请时替换旧申请；纯学生名册/元数据更新不能误删既有申请。
-            if (apply) {
+      if (apply) {
         const oldApply = db
           .prepare('SELECT apply_id AS applyId FROM apply WHERE batch_id = ? AND student_id = ?')
           .get(batch.batchId, existing.id) as { applyId: string } | undefined
@@ -919,7 +978,8 @@ export async function importBatchExchange(
       const slipPath = apply.confirmSlip
         ? stageConfirmSlip(evidenceStage, apply.confirmSlip)
         : apply.confirmSlipRef
-          ? stageExchangeAssetRefs(evidenceStage, 'confirm-slip', [apply.confirmSlipRef])[0] ?? null
+          ? (stageExchangeAssetRefs(evidenceStage, 'confirm-slip', [apply.confirmSlipRef])[0] ??
+            null)
           : null
       db.prepare(
         `INSERT INTO apply (apply_id, batch_id, student_id, status, current_revision, imported_at, confirm_slip)
@@ -950,13 +1010,26 @@ export async function importBatchExchange(
       }
       for (const event of apply.timeline ?? []) {
         if (!event.eventId || !Number.isFinite(event.occurredAt)) continue
-        if (!['student.entered', 'student.exported', 'admin.imported', 'admin.modified', 'admin.exported', 'admin.confirmed'].includes(event.action)) continue
+        if (
+          ![
+            'student.entered',
+            'student.exported',
+            'admin.imported',
+            'admin.modified',
+            'admin.exported',
+            'admin.confirmed'
+          ].includes(event.action)
+        )
+          continue
         insertTimelineEvent({
           eventId: event.eventId,
           batchId: batch.batchId,
           applyId: apply.applyId,
           actorType: event.actorType,
-          role: event.role === 'level1' || event.role === 'level2' || event.role === 'level3' ? event.role : undefined,
+          role:
+            event.role === 'level1' || event.role === 'level2' || event.role === 'level3'
+              ? event.role
+              : undefined,
           action: event.action as Parameters<typeof insertTimelineEvent>[0]['action'],
           occurredAt: event.occurredAt,
           revision: event.revision,
