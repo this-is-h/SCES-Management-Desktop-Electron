@@ -1,0 +1,92 @@
+name: 发布 Windows 安装包并生成更新元数据
+
+# 触发：打 v* tag（如 v0.2.0）或手动 dispatch。
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch: {}
+
+# 权限：创建 GitHub Release。
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & Release
+    runs-on: windows-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          # 必须取全量历史：默认 shallow(depth=1) 只带 tag 自身提交，
+          # Release 说明生成需要 tag 区间。
+          fetch-depth: 0
+
+      - name: 配置私有依赖认证（@sces/shared / @sces/contracts git 依赖 + sces-web 推送）
+        run: git config --global url."https://x-access-token:${SCES_CI_TOKEN}@github.com/".insteadOf "https://github.com/"
+        env:
+          SCES_CI_TOKEN: ${{ secrets.SCES_CI_TOKEN }}
+
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.9.0
+
+      - name: 安装 Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 构建 Windows 安装包（服务端 API 地址与发布档取自 deploy/profile.json）
+        # electron-builder.mjs 从 deploy/profile.json 注入 DMS_PROFILE_ID，
+        # 产物名形如 学生综合素质测评管理系统-0.2.0-online-2026s1-setup.exe。
+        run: |
+          pnpm run build
+          node ./scripts/electron-builder.mjs --win --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+
+      - name: 生成更新元数据 latest.json
+        # version 取仓库根 package.json；输出到 dist-update/latest.json。
+        run: node scripts/gen-update-manifest.mjs
+
+      - name: 推送 latest.json 到 sces-web（触发 Vercel 自动部署）
+        # sces-web 是独立仓库，Vercel git 集成绑定它的 main 分支；
+        # latest.json 必须落在 sces-web 的 main 才能触发部署。
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git clone --depth 1 "https://x-access-token:${SCES_CI_TOKEN}@github.com/this-is-h/sces-web.git" web-repo
+          cp dist-update/latest.json web-repo/public/updates/latest.json
+          cd web-repo
+          git add public/updates/latest.json
+          if git diff --cached --quiet; then
+            echo "latest.json 无变更，跳过推送"
+          else
+            git commit -m "chore(updates): bump latest.json to ${GITHUB_REF_NAME#v}"
+            git push origin HEAD:main
+          fi
+        env:
+          SCES_CI_TOKEN: ${{ secrets.SCES_CI_TOKEN }}
+
+      - name: 上传安装包到 GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: |
+            dist/*.exe
+          generate_release_notes: true
+          body: |
+            ## 下载
+
+            安装包：`${{ github.event.repository.html_url }}/releases/download/${{ github.ref_name }}/学生综合素质测评管理系统-<版本>-<profileId>-setup.exe`
+
+            - GitHub 直链：`${{ github.event.repository.html_url }}/releases/download/${{ github.ref_name }}`
+            - 国内加速镜像：`https://ghproxy.com/https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}`
+
+            > 提示：管理端「设置 → 检查更新」会自动发现本版本并引导到下载页，不会自动覆盖安装包。

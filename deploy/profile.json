@@ -1,0 +1,32 @@
+{
+  "profileId": "online-2026s1",
+  "mode": "online",
+  "management": {
+    "serverUrl": "https://api.dms.example.com",
+    "allowDevServerOverride": true,
+    "licenseVerifyKeys": [
+      {
+        "keyId": "vendor-2026a",
+        "publicKeyJwk": {
+          "kty": "RSA",
+          "n": "wuPhfatfPSNBPo4KIBzwvMCimuwaiHvdozmZZY4DS5Iidr3aDSWnOTWQ2m7rLLoBAZw514V33qRr6WOD6t5V9w79aQr4o7HHwZVajEmROYRjGRg2BT8WaBXSP4dc8V7aAVuoQZ03CuVyvKEKzj2AcurCktUBNe9CtoKIK_2nXA9WhGGzbgNY9WWKg9-7mKKjNVhjj3gu9VyjhPidef85GDjrP2MOws98yqorm8MiBarXM1Bwl5hFdDvXEDXkT05yL3ZB5lFN5_wtneOZF8rsJPUGRJ_oq0Yo7c-eeQYHC8salgOvAe3pUCSt7S8m-D968X9zq3QsS54UatTPIrzMUw",
+          "e": "AQAB"
+        }
+      }
+    ],
+    "clockGuard": {
+      "enabled": true,
+      "toleranceMs": 86400000
+    },
+    "updateUrl": "https://dms.thisish.cn/updates/latest.json"
+  },
+  "student": {
+    "serverBaseUrl": "https://api.dms.example.com",
+    "offlineUnits": [],
+    "localVault": {
+      "enabled": true,
+      "secretRef": "student-vault.json",
+      "version": 1
+    }
+  }
+}

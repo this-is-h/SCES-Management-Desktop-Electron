@@ -1,0 +1,453 @@
+{
+  "schemaVersion": 1,
+  "id": "test-1",
+  "name": "测试单位一德育分办法",
+  "version": 1,
+  "revision": 0,
+  "status": "published",
+  "unit": {
+    "unitId": "testTest1",
+    "name": "测试1",
+    "unitType": "college",
+    "parentUnit": {
+      "unitId": "test",
+      "name": "测试学校"
+    }
+  },
+  "class": {
+    "titles": [
+      "学院",
+      "专业",
+      "班级"
+    ],
+    "options": [
+      {
+        "text": "测试学院",
+        "value": "测试学院",
+        "children": [
+          {
+            "text": "测试专业",
+            "value": "测试专业",
+            "children": [
+              {
+                "text": "1班",
+                "value": "测试专业1班"
+              },
+              {
+                "text": "2班",
+                "value": "测试专业2班"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "student": [
+    {
+      "code": "name",
+      "label": "姓名",
+      "required": true,
+      "type": "text",
+      "message": "请输入正确的姓名"
+    },
+    {
+      "code": "studentId",
+      "label": "学号",
+      "required": true,
+      "type": "text",
+      "pattern": "^1\\d{10}$",
+      "message": "学号应为11位数字"
+    },
+    {
+      "code": "phone",
+      "label": "手机号",
+      "required": true,
+      "type": "text",
+      "pattern": "^1[3-9]\\d{9}$",
+      "message": "手机号应为11位数字"
+    },
+    {
+      "code": "grade",
+      "label": "年级",
+      "required": true,
+      "type": "text",
+      "pattern": "^\\d{4}$",
+      "message": "年级应为4位数字，如2025"
+    },
+    {
+      "code": "major",
+      "label": "专业",
+      "required": true,
+      "type": "text",
+      "message": "请通过班级信息选择专业",
+      "fromClass": true
+    },
+    {
+      "code": "className",
+      "label": "班级",
+      "required": true,
+      "type": "text",
+      "pattern": "^[\\u4e00-\\u9fa5a-zA-Z0-9]+班$",
+      "message": "班级名称应为“xx班”",
+      "fromClass": true
+    }
+  ],
+  "dyf": {
+    "categories": [
+      {
+        "code": "base",
+        "name": "基础分",
+        "studentRequired": false,
+        "adminRequired": false,
+        "penalty": false,
+        "groups": [
+          {
+            "code": "base-1",
+            "name": "思想品德",
+            "items": [
+              {
+                "code": "111",
+                "description": "思想端正，遵守校规校纪，积极参加思想政治教育活动。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 2,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "121",
+                "description": "关心集体，爱护公物，尊敬师长，友爱同学。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 2,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              }
+            ]
+          },
+          {
+            "code": "base-2",
+            "name": "学业表现",
+            "items": [
+              {
+                "code": "211",
+                "description": "按时上课，不无故缺勤、迟到、早退。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 3,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "221",
+                "description": "通过大学英语四级/六级考试。",
+                "scoreType": {
+                  "type": "radio",
+                  "options": [
+                    {
+                      "value": 0,
+                      "label": "未通过"
+                    },
+                    {
+                      "value": 4,
+                      "label": "通过四级"
+                    },
+                    {
+                      "value": 6,
+                      "label": "通过六级"
+                    }
+                  ]
+                },
+                "support": {
+                  "need": true,
+                  "message": "四级/六级证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": true,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "231",
+                "description": "参加院级及以上校园活动，多个活动累积记分，累积不超过12分。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 12,
+                  "step": 0.5,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "综测证明"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              }
+            ]
+          },
+          {
+            "code": "base-3",
+            "name": "校园活动",
+            "items": [
+              {
+                "code": "311",
+                "description": "积极参加体育锻炼，保持身心健康。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 2,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "321",
+                "description": "参加志愿服务活动，按服务时长记分。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 6,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "志愿服务记录"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "code": "reward",
+        "name": "奖励分",
+        "studentRequired": true,
+        "adminRequired": false,
+        "penalty": false,
+        "groups": [
+          {
+            "code": "reward-1",
+            "name": "竞赛与荣誉",
+            "items": [
+              {
+                "code": "411",
+                "description": "参加学科竞赛获奖，按等级累积记分。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "421",
+                "description": "获校级及以上荣誉称号，累积记分。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "431",
+                "description": "担任学生干部并考核合格，按任职情况记分。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 5,
+                  "step": 0.5,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "测评业绩"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "code": "penalty",
+        "name": "惩罚分",
+        "studentRequired": false,
+        "adminRequired": false,
+        "penalty": true,
+        "groups": [
+          {
+            "code": "penalty-1",
+            "name": "违纪处分",
+            "items": [
+              {
+                "code": "511",
+                "description": "受到通报批评及以上处分，按处分等级累积扣分。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 5,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "code": "extra",
+        "name": "评定组裁定",
+        "studentRequired": false,
+        "adminRequired": true,
+        "penalty": false,
+        "groups": [
+          {
+            "code": "extra-1",
+            "name": "其他测评要素",
+            "items": [
+              {
+                "code": "611",
+                "description": "本办法未提及的测评要素，由评定组决定是否加分。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "相关证明材料"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "621",
+                "description": "本办法未提及的测评要素，由评定组决定是否扣分。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "相关证明材料"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": true
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "calc": {
+    "calcMode": "weighted",
+    "dyfWeight": 0.3,
+    "courseWeight": 0.7
+  },
+  "rank": {
+    "tieRule": "same-rank"
+  }
+}

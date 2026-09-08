@@ -1,0 +1,2655 @@
+{
+  "schemaVersion": 1,
+  "id": "lixing-shuyuan",
+  "name": "宁夏大学励行书院德育分办法",
+  "version": 1,
+  "revision": 0,
+  "status": "published",
+  "unit": {
+    "unitId": "nxuLx",
+    "name": "励行书院",
+    "unitType": "college",
+    "parentUnit": {
+      "unitId": "nxu",
+      "name": "宁夏大学"
+    }
+  },
+  "class": {
+    "titles": [
+      "学院",
+      "专业",
+      "班级"
+    ],
+    "options": [
+      {
+        "text": "生命科学学院",
+        "value": "生命科学学院",
+        "children": [
+          {
+            "text": "生物科学",
+            "value": "生物科学",
+            "children": [
+              {
+                "text": "1班",
+                "value": "生物科学1班"
+              },
+              {
+                "text": "2班",
+                "value": "生物科学2班"
+              }
+            ]
+          },
+          {
+            "text": "生物科学（基础拔尖人才培养）",
+            "value": "生物科学（基础拔尖人才培养）",
+            "children": [
+              {
+                "text": "1班",
+                "value": "生物科学（基础拔尖人才培养）1班"
+              }
+            ]
+          },
+          {
+            "text": "生物技术",
+            "value": "生物技术",
+            "children": [
+              {
+                "text": "1班",
+                "value": "生物技术1班"
+              },
+              {
+                "text": "2班",
+                "value": "生物技术2班"
+              }
+            ]
+          },
+          {
+            "text": "生物科学（师范）",
+            "value": "生物科学（师范）",
+            "children": [
+              {
+                "text": "1班",
+                "value": "生物科学（师范）1班"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "动物科技学院",
+        "value": "动物科技学院",
+        "children": [
+          {
+            "text": "动物科学",
+            "value": "动物科学",
+            "children": [
+              {
+                "text": "1班",
+                "value": "动物科学1班"
+              },
+              {
+                "text": "2班",
+                "value": "动物科学2班"
+              }
+            ]
+          },
+          {
+            "text": "动物医学",
+            "value": "动物医学",
+            "children": [
+              {
+                "text": "1班",
+                "value": "动物医学1班"
+              },
+              {
+                "text": "2班",
+                "value": "动物医学2班"
+              }
+            ]
+          },
+          {
+            "text": "动物科学（卓越农林人才计划）",
+            "value": "动物科学（卓越农林人才计划）",
+            "children": [
+              {
+                "text": "1班",
+                "value": "动物科学（卓越农林人才计划）1班"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "食品科学与工程学院",
+        "value": "食品科学与工程学院",
+        "children": [
+          {
+            "text": "食品科学与工程",
+            "value": "食品科学与工程",
+            "children": [
+              {
+                "text": "1班",
+                "value": "食品科学与工程1班"
+              },
+              {
+                "text": "2班",
+                "value": "食品科学与工程2班"
+              },
+              {
+                "text": "3班",
+                "value": "食品科学与工程3班"
+              }
+            ]
+          },
+          {
+            "text": "食品科学与工程（生物工程方向）",
+            "value": "食品科学与工程（生物工程方向）",
+            "children": [
+              {
+                "text": "1班",
+                "value": "食品科学与工程（生物工程方向）1班"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "土木与水利工程学院",
+        "value": "土木与水利工程学院",
+        "children": [
+          {
+            "text": "土木工程",
+            "value": "土木工程",
+            "children": [
+              {
+                "text": "1班",
+                "value": "土木工程1班"
+              },
+              {
+                "text": "2班",
+                "value": "土木工程2班"
+              }
+            ]
+          },
+          {
+            "text": "道路桥梁与渡河工程",
+            "value": "道路桥梁与渡河工程",
+            "children": [
+              {
+                "text": "1班",
+                "value": "道路桥梁与渡河工程1班"
+              },
+              {
+                "text": "2班",
+                "value": "道路桥梁与渡河工程2班"
+              }
+            ]
+          },
+          {
+            "text": "水利水电工程",
+            "value": "水利水电工程",
+            "children": [
+              {
+                "text": "1班",
+                "value": "水利水电工程1班"
+              }
+            ]
+          },
+          {
+            "text": "农业水利工程",
+            "value": "农业水利工程",
+            "children": [
+              {
+                "text": "1班",
+                "value": "农业水利工程1班"
+              }
+            ]
+          },
+          {
+            "text": "智慧水利",
+            "value": "智慧水利",
+            "children": [
+              {
+                "text": "1班",
+                "value": "智慧水利1班"
+              }
+            ]
+          },
+          {
+            "text": "工程管理",
+            "value": "工程管理",
+            "children": [
+              {
+                "text": "1班",
+                "value": "工程管理1班"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "建筑学院",
+        "value": "建筑学院",
+        "children": [
+          {
+            "text": "建筑学",
+            "value": "建筑学",
+            "children": [
+              {
+                "text": "1班",
+                "value": "建筑学1班"
+              }
+            ]
+          },
+          {
+            "text": "城乡规划",
+            "value": "城乡规划",
+            "children": [
+              {
+                "text": "1班",
+                "value": "城乡规划1班"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "地理科学与规划学院",
+        "value": "地理科学与规划学院",
+        "children": [
+          {
+            "text": "地理科学",
+            "value": "地理科学",
+            "children": [
+              {
+                "text": "1班",
+                "value": "地理科学1班"
+              }
+            ]
+          },
+          {
+            "text": "地理信息科学",
+            "value": "地理信息科学",
+            "children": [
+              {
+                "text": "1班",
+                "value": "地理信息科学1班"
+              }
+            ]
+          },
+          {
+            "text": "地理科学（师范）",
+            "value": "地理科学（师范）",
+            "children": [
+              {
+                "text": "1班",
+                "value": "地理科学（师范）1班"
+              }
+            ]
+          },
+          {
+            "text": "人文地理与城乡规划",
+            "value": "人文地理与城乡规划",
+            "children": [
+              {
+                "text": "1班",
+                "value": "人文地理与城乡规划1班"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "student": [
+    {
+      "code": "name",
+      "label": "姓名",
+      "required": true,
+      "type": "text",
+      "message": "请输入正确的姓名"
+    },
+    {
+      "code": "studentId",
+      "label": "学号",
+      "required": true,
+      "type": "text",
+      "pattern": "^1\\d{10}$",
+      "message": "学号应为11位数字"
+    },
+    {
+      "code": "phone",
+      "label": "手机号",
+      "required": true,
+      "type": "text",
+      "pattern": "^1[3-9]\\d{9}$",
+      "message": "手机号应为11位数字"
+    },
+    {
+      "code": "grade",
+      "label": "年级",
+      "required": true,
+      "type": "text",
+      "pattern": "^\\d{4}$",
+      "message": "年级应为4位数字，如2025"
+    },
+    {
+      "code": "major",
+      "label": "专业",
+      "required": true,
+      "type": "text",
+      "message": "请通过班级信息选择专业",
+      "fromClass": true
+    },
+    {
+      "code": "className",
+      "label": "班级",
+      "required": true,
+      "type": "text",
+      "pattern": "^[\\u4e00-\\u9fa5a-zA-Z0-9]+班$",
+      "message": "班级名称应为“xx班”",
+      "fromClass": true
+    }
+  ],
+  "dyf": {
+    "categories": [
+      {
+        "code": "base",
+        "name": "基础分",
+        "studentRequired": false,
+        "adminRequired": false,
+        "penalty": false,
+        "groups": [
+          {
+            "code": "base-1",
+            "name": "思想政治类",
+            "items": [
+              {
+                "code": "111",
+                "description": "认真学习马列主义、毛泽东思想、邓小平理论、“三个代表”重要思想、科学发展观，深入学习贯彻习近平新时代中国特色社会主义思想。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 2,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "112",
+                "description": "树牢“四个意识”，坚定“四个自信”，坚决做到“两个维护”，自觉加强政治修养，主动向党团组织靠拢。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 2,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "113",
+                "description": "积极参加思想政治教育活动，政治上积极争取进步，有明确的是非观念，做事公正，为人正派。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 2,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "114",
+                "description": "弘扬传统美德，遵守社会公德，正确处理国家、集体和个人三者利益关系",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 2,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              }
+            ]
+          },
+          {
+            "code": "base-2",
+            "name": "道德法制类",
+            "items": [
+              {
+                "code": "211",
+                "description": "爱国守法，践行社会主义核心价值观，自觉遵守公民道德规范，自觉遵守学校管理制度，创造和维护文明、整洁、优美、安全的学习和生活环境。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 2,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "212",
+                "description": "维护教学秩序，不旷课、不迟到、不早退、不打架斗殴、不酗酒、不赌博，运用法规和校纪规范自己的言行，做一名遵纪守法的公民。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 2,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "213",
+                "description": "踊跃参加校园活动，不从事、参与有损大学生形象、有损社会公德的活动。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 2,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "214",
+                "description": "关心集体，爱护公物，勤俭节约。尊敬师长，友爱同学，团结合作。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 2,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              }
+            ]
+          },
+          {
+            "code": "base-3",
+            "name": "学业状态类",
+            "items": [
+              {
+                "code": "311",
+                "description": "具有正确的专业思想、学习动机和学习态度。具有奋发向上、积极进取、自强不息、开拓创新的意识。具有勤奋好学、刻苦钻研的精神。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 3,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "312",
+                "description": "按时上课（晚自习），不无故缺勤、迟到、早退等，按时完成课堂和课后学习任务。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 3,
+                  "step": 3,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "313",
+                "description": "通过大学英语四级/六级考试。",
+                "scoreType": {
+                  "type": "radio",
+                  "options": [
+                    {
+                      "value": 0,
+                      "label": "未通过"
+                    },
+                    {
+                      "value": 4,
+                      "label": "通过四级"
+                    },
+                    {
+                      "value": 6,
+                      "label": "通过六级"
+                    }
+                  ]
+                },
+                "support": {
+                  "need": true,
+                  "message": "四级/六级证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": true,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              }
+            ]
+          },
+          {
+            "code": "base-4",
+            "name": "劳动卫生类",
+            "items": [
+              {
+                "code": "411",
+                "description": "具有正确劳动观，热爱劳动，尊重劳动，具备劳动素养，掌握劳动技能，积极参与学校组织的各项劳动。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 2,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "412",
+                "description": "遵守网络法律法规，文明使用网络，不留宿他人，不藏匿各种管制刀具和凶器，不赌博等。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 2,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "413",
+                "description": "严格遵守住宿管理规定，自觉维护宿舍楼内正常秩序，按时归宿，能保持较好的宿舍卫生环境和个人生活卫生习惯。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 2,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              }
+            ]
+          },
+          {
+            "code": "base-5",
+            "name": "校园文化类",
+            "items": [
+              {
+                "code": "511",
+                "description": "扎根时代生活，遵循美育特点，弘扬中华美育精神，培养审美情趣，具备鉴赏美、创造美的能力",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 2,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "512",
+                "description": "积极参加各项体育活动，养成良好的体育锻炼习惯，保持身心健康。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 2,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "521",
+                "description": "参加院/班级及以上等级校园活动，多个活动累积记分，累积不超过12分，获奖等级奖励分另行计算",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 12,
+                  "step": 0.5,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "综测证明"
+                },
+                "studentApplicable": true,
+                "studentRequired": true,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "code": "reward",
+        "name": "奖励分",
+        "studentRequired": true,
+        "adminRequired": false,
+        "penalty": false,
+        "groups": [
+          {
+            "code": "reward-1",
+            "name": "校园活动类",
+            "items": [
+              {
+                "code": "711",
+                "description": "参加院级及以上主题辅导报告、座谈会等单次活动。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.5,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "综测证明"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "712",
+                "description": "根据校/院级工作/活动安排，积极参与单次工作/活动，根据贡献量进行评分0-2分。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.5,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "综测证明"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "721",
+                "description": "参加院级及以上的大型文艺演出（比赛）等活动，每个节目（比赛）根据贡献量加0-4分，上限12分。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 12,
+                  "step": 0.5,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "综测证明"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "722",
+                "description": "参加院级及以上的大型体育赛事等，每个比赛根据贡献量加0-4分，上限12分。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 12,
+                  "step": 0.5,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "综测证明"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "731",
+                "description": "参加校级或院级艺术类、体育类队伍等团体的学生，坚持日常训练并按要求完成工作任务（完整学期）。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.5,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "综测证明"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              }
+            ]
+          },
+          {
+            "code": "reward-2",
+            "name": "社会公益类",
+            "items": [
+              {
+                "code": "811",
+                "description": "参加寒暑假“返家乡”、“三下乡“等社会实践活动并成功结项，根据证书/证明进行加分。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 6,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "社会实践证书/证明"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "821",
+                "description": "参加无偿献血。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 5,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "献血证"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "822",
+                "description": "其他公益活动并受到主办方表扬。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 6,
+                  "step": 2,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "表扬信/活动证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              }
+            ]
+          },
+          {
+            "code": "reward-3",
+            "name": "学风建设类",
+            "items": [
+              {
+                "code": "911",
+                "description": "积极参与书院学风建设活动，累积学业辅导不少于2小时，长期辅导活动可累积记分，累积总分不超过8。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 8,
+                  "step": 2,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "综测证明"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "921",
+                "description": "担任学风建设类、科技创新类、生涯规划类等讲座嘉宾，讲座时长不少于1.5小时。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 2,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "综测证明"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "931",
+                "description": "通过国家各类技能等级考试。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 4,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "技能证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              }
+            ]
+          },
+          {
+            "code": "reward-4",
+            "name": "科技创新类",
+            "items": [
+              {
+                "code": "1011",
+                "description": "以第一作者身份在SCI、EI等期刊发表学术论文，第二作者分数系数0.8，第三作者分数数0.5，第四作者及以后分数系数0.3。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "期刊"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1012",
+                "description": "以第一作者身份在核心期刊发表学术论文，第二作者分数系数0.8，第三作者分数系数0.5，第四作者及以后分数系数0.3。。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "期刊"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1013",
+                "description": "以第一作者身份在普通期刊发表学术论文，第二作者分数系数0.8，第三作者分数系数0.5，第四作者及以后分数系数0.3。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "期刊"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1014",
+                "description": "以第一发明人身份获得发明专利授权，第二发明人分数系数0.8，第三发明人分数系数0.5，第四发明人及以后分数系数0.3。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "授权书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1015",
+                "description": "以第一发明人身份获得实用新型（外观）专利授权和软件著作权，第二发明人分数系数0.8，第三发明人分数系数0.5，第四发明人及以后分数系数0.3，专利公开不计分。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "授权书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1021",
+                "description": "参加院级及以上创新创业项目并结题。第一完成人分数系数1，第二完成人分数系数0.8，第三完成人分数系数0.5第四及以后完成人分数系数0.3。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "结题证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              }
+            ]
+          },
+          {
+            "code": "reward-5",
+            "name": "学科竞赛类",
+            "items": [
+              {
+                "code": "1111",
+                "description": "获得国家级学科竞赛一等奖。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1112",
+                "description": "获得国家级学科竞赛二等奖。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1113",
+                "description": "获得国家级学科竞赛三等奖。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1114",
+                "description": "获得国家级学科竞赛优秀奖（参与奖、鼓励奖）。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1121",
+                "description": "获得省（自治区）级学科竞赛一等奖。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1122",
+                "description": "获得省（自治区）学科竞赛二等奖。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1123",
+                "description": "获得省（自治区）级学科竞赛三等奖。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1124",
+                "description": "获得省（自治区）级学科竞赛优秀奖（参与奖、鼓励奖）。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1131",
+                "description": "获得校级学科竞赛一等奖。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1132",
+                "description": "获得校级学科竞赛二等奖。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1133",
+                "description": "获得校级学科竞赛三等奖。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1134",
+                "description": "获得校级学科竞赛优秀奖（参与奖、鼓励奖）。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1141",
+                "description": "获得院级学科竞赛一等奖。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1142",
+                "description": "获得院级学科竞赛二等奖。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1143",
+                "description": "获得院级学科竞赛三等奖。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1144",
+                "description": "获得院级学科竞赛优秀奖（参与奖、鼓励奖）。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              }
+            ]
+          },
+          {
+            "code": "reward-6",
+            "name": "创优争先类",
+            "items": [
+              {
+                "code": "1211",
+                "description": "国家级荣誉称号（党中央、国务院、共青团中央、教育部等部门授予）",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1212",
+                "description": "省级荣誉称号（省党委、政府团省委、教育厅等部门授予）",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1213",
+                "description": "校级荣誉称号（校党委、行政部门、校团委、学生处等授予）",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1214",
+                "description": "院级荣誉称号（院党委、行政院团委授予）",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1221",
+                "description": "国家级一等/二等/三等/优秀奖（党中央、国务院、共青团中央、教育部等部门授予）",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1222",
+                "description": "省级一等/二等/三等/优秀奖（省党委、政府、团省委、教育厅等部门授予）",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1223",
+                "description": "校级一等/二等/三等/优秀奖（校党委、行政部门、校团委学生处等授予）",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1224",
+                "description": "院级一等/二等/三等/优秀奖",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1231",
+                "description": "运动会第1-3名/第4-8名",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "综测证明"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1232",
+                "description": "每周优秀宿舍",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 8,
+                  "step": 0.5,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "公示通报"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1233",
+                "description": "学生组织标兵部门",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 4,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1234",
+                "description": "学生组织优秀部门",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 2,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1235",
+                "description": "书院认定的其他学生集体荣誉",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "荣誉证书"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              }
+            ]
+          },
+          {
+            "code": "reward-7",
+            "name": "学干培养类",
+            "takeHighest": {
+              "scope": "group"
+            },
+            "items": [
+              {
+                "code": "1311",
+                "description": "书院学生组织负责人",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 20,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "测评业绩"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1312",
+                "description": "书院学生组织部门负责人",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 16,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "测评业绩"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1313",
+                "description": "书院学生组织工作人员",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 12,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "测评业绩"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1321",
+                "description": "团支书（班长） 纪律委员（副班长）",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 16,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "测评业绩"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1322",
+                "description": "其他班委、支委",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 12,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "测评业绩"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1331",
+                "description": "党支部委员",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 16,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "测评业绩"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1351",
+                "description": "校级学生组织主席团级成员、部长团级成员、干事级成员（以校级组织提供的加分证明为准）",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "综测加分证明"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              }
+            ]
+          },
+          {
+            "code": "reward-8",
+            "name": "项目化群体类",
+            "items": [
+              {
+                "code": "1411",
+                "description": "党建思政中心 - 党小组组长",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 5,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "测评业绩"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1421",
+                "description": "宿舍园区管理 - 宿舍长",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 5,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "测评业绩"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1422",
+                "description": "宿舍园区管理 - 楼长",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 8,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "测评业绩"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1423",
+                "description": "宿舍园区管理 - 层长",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 5,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "测评业绩"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1431",
+                "description": "创新产业分中心 - 工作人员",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 12,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "测评业绩"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1441",
+                "description": "学生社团 - 主要负责人",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 8,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "测评业绩"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1442",
+                "description": "学生社团 - 小组负责人",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 5,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "测评业绩"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1443",
+                "description": "学生社团 - 社团成员",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 2,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "综测证明"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1451",
+                "description": "遇见励行工作室 - 主要负责人",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 16,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "测评业绩"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1452",
+                "description": "遇见励行工作室 - 小组负责人",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 12,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "测评业绩"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1453",
+                "description": "遇见励行工作室 - 工作人员",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 10,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "测评业绩"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1461",
+                "description": "大学生艺术团 - 团长",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 16,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "测评业绩"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1462",
+                "description": "大学生艺术团 - 队长、副队长",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 12,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "测评业绩"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1471",
+                "description": "体育类队伍 - 主要负责人",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 12,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "测评业绩"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "1472",
+                "description": "体育类队伍 - 队长、副队长",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "max": 10,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": true,
+                  "message": "测评业绩"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "code": "penalty",
+        "name": "惩罚分",
+        "studentRequired": false,
+        "adminRequired": false,
+        "penalty": true,
+        "groups": [
+          {
+            "code": "penalty-1",
+            "name": "违纪处分类",
+            "items": [
+              {
+                "code": "1511",
+                "description": "党内/行政/团内留校（党/团）察看处分",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 40,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "1512",
+                "description": "党内/行政/团内记过处分",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 20,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "1513",
+                "description": "党内/行政/团内严重警告处分",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 15,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "1514",
+                "description": "党内/行政/团内警告处分",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 10,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "1515",
+                "description": "党内/行政/团内通报批评",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              }
+            ]
+          },
+          {
+            "code": "penalty-2",
+            "name": "宿区管理类",
+            "items": [
+              {
+                "code": "1611",
+                "description": "较差宿舍",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "1621",
+                "description": "留宿他人、晚归等其他违规行为",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 2,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "1622",
+                "description": "使用违规电器",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 5,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "1623",
+                "description": "其他违反住宿管理规定的行为",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 5,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "1624",
+                "description": "损坏宿舍桌椅床柜、信息牌等公物",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 3,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              }
+            ]
+          },
+          {
+            "code": "penalty-3",
+            "name": "履职尽责类",
+            "items": [
+              {
+                "code": "1711",
+                "description": "学生干部或项目化成员不作为，造成不良影响",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 3,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "1712",
+                "description": "学生干部或项目化成员不作为，造成严重后果",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 5,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "1713",
+                "description": "任期未满一届，因个人原因退出或被上级组织辞退",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 8,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "1721",
+                "description": "利用手中职权，徇私舞弊，造成不良影响",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 5,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "1722",
+                "description": "利用手中职权，徇私舞弊，造成严重后果",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 10,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              }
+            ]
+          },
+          {
+            "code": "penalty-4",
+            "name": "纪律考勤类",
+            "items": [
+              {
+                "code": "1811",
+                "description": "课堂缺勤、早退、迟到（每次）",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "1821",
+                "description": "早操缺勤、早退、迟到（每次）",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "1831",
+                "description": "晚自习缺勤、早退、迟到（每次）",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              },
+              {
+                "code": "1841",
+                "description": "校院活动缺勤、早退、迟到（每次）",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 1,
+                  "decimals": 0
+                },
+                "support": {
+                  "need": false
+                },
+                "studentApplicable": false,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": false
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "code": "extra",
+        "name": "第八项第三条",
+        "studentRequired": true,
+        "adminRequired": true,
+        "penalty": false,
+        "groups": [
+          {
+            "code": "extra-1",
+            "name": "书院评定组决定",
+            "items": [
+              {
+                "code": "8881",
+                "description": "当涉及本实施方法中未提及的测评要素，可向书院评定组提出申请，由书院评定组决定是否给予奖励分",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "相关证明材料"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": true,
+                "negative": false
+              },
+              {
+                "code": "8882",
+                "description": "当涉及本实施方法中未提及的测评要素，可向书院评定组提出申请，由书院评定组决定是否扣除惩罚分。",
+                "scoreType": {
+                  "type": "stepper",
+                  "min": 0,
+                  "step": 0.1,
+                  "decimals": 1
+                },
+                "support": {
+                  "need": true,
+                  "message": "相关证明材料"
+                },
+                "studentApplicable": true,
+                "studentRequired": false,
+                "adminEditable": true,
+                "adminRequired": false,
+                "allowAdd": false,
+                "negative": true
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "calc": {
+    "calcMode": "weighted",
+    "dyfWeight": 0.3,
+    "courseWeight": 0.7
+  },
+  "rank": {
+    "tieRule": "same-rank"
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
+  "appId": "cn.thisish.dms",
+  "productName": "学生综合素质测评管理系统",
+  "directories": {
+    "buildResources": "build"
+  },
+  "files": [
+    "!**/.vscode/*",
+    "!src/*",
+    "!electron.vite.config.{js,ts,mjs,cjs}",
+    "!.eslintcache",
+    "!eslint.config.mjs",
+    "!.prettierignore",
+    "!.prettierrc.yaml",
+    "!CHANGELOG.md",
+    "!README.md",
+    "!.env",
+    "!.env.*",
+    "!.npmrc",
+    "!tsconfig.json",
+    "!tsconfig.node.json",
+    "!tsconfig.web.json"
+  ],
+  "asarUnpack": [
+    "resources/**"
+  ],
+  "extraResources": [
+    {
+      "from": "THIRD_PARTY_NOTICES.md",
+      "to": "THIRD_PARTY_NOTICES.md"
+    }
+  ],
+  "win": {
+    "executableName": "dms-management-desktop"
+  },
+  "nsis": {
+    "artifactName": "${productName}-${version}-${env.DMS_PROFILE_ID}-setup.${ext}",
+    "shortcutName": "${productName}",
+    "uninstallDisplayName": "${productName}",
+    "createDesktopShortcut": "always",
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "perMachine": false,
+    "runAfterFinish": true
+  },
+  "mac": {
+    "entitlementsInherit": "build/entitlements.mac.plist",
+    "extendInfo": [
+      {
+        "NSCameraUsageDescription": "Application requests access to the device's camera."
+      },
+      {
+        "NSMicrophoneUsageDescription": "Application requests access to the device's microphone."
+      },
+      {
+        "NSDocumentsFolderUsageDescription": "Application requests access to the user's Documents folder."
+      },
+      {
+        "NSDownloadsFolderUsageDescription": "Application requests access to the user's Downloads folder."
+      }
+    ],
+    "notarize": false
+  },
+  "dmg": {
+    "artifactName": "${name}-${version}.${ext}"
+  },
+  "linux": {
+    "target": [
+      "AppImage",
+      "snap",
+      "deb"
+    ],
+    "maintainer": "electronjs.org",
+    "category": "Utility"
+  },
+  "appImage": {
+    "artifactName": "${name}-${version}.${ext}"
+  },
+  "npmRebuild": false,
+  "electronDownload": {
+    "mirror": "https://npmmirror.com/mirrors/electron/"
+  }
+}

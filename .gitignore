@@ -1,0 +1,16 @@
+node_modules
+dist
+out
+.DS_Store
+.eslintcache
+*.log*
+
+# Nuxt UI 自动生成的类型声明（vite 运行时写入到渲染进程目录）
+src/renderer/auto-imports.d.ts
+src/renderer/components.d.ts
+
+# 构建/发布产物与本地密钥
+*.tsbuildinfo
+repro-*.cjs
+\.electron-vite/
+node_modules/

@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [develop, main]
+
+permissions:
+  contents: read
+
+jobs:
+  branch-name:
+    name: 分支名校验（简化版 Git Flow）
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: 校验分支前缀
+        run: |
+          ref="${{ github.ref_name }}"
+          case "$ref" in
+            main|develop|feature/*|bugfix/*|hotfix/*|chore/*|release/*)
+              ;;
+            *)
+              echo "::error::分支名违规：$ref（须以 feature/ bugfix/ hotfix/ chore/ release/ 开头，或为 main/develop）"
+              exit 1
+              ;;
+          esac
+
+  build-and-typecheck:
+    name: 编译 + 类型检查 + Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.9.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: 配置私有依赖认证（@sces/shared / @sces/contracts 为 git 依赖）
+        if: ${{ secrets.SCES_CI_TOKEN != '' }}
+        run: git config --global url."https://x-access-token:${SCES_CI_TOKEN}@github.com/".insteadOf "https://github.com/"
+        env:
+          SCES_CI_TOKEN: ${{ secrets.SCES_CI_TOKEN }}
+      - run: pnpm install --frozen-lockfile
+      - name: 编译门禁
+        run: pnpm build
+      - name: Lint 门禁
+        run: pnpm lint
+      - name: 类型检查门禁
+        run: pnpm typecheck
+
+  supply-chain-audit:
+    name: 供应链安全检查
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.9.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: 配置私有依赖认证
+        if: ${{ secrets.SCES_CI_TOKEN != '' }}
+        run: git config --global url."https://x-access-token:${SCES_CI_TOKEN}@github.com/".insteadOf "https://github.com/"
+        env:
+          SCES_CI_TOKEN: ${{ secrets.SCES_CI_TOKEN }}
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm audit --audit-level high
+
+  gitleaks:
+    name: 密钥泄漏扫描
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

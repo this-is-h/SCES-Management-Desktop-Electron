@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dms.local/profile.schema.json",
+  "title": "DMS 发布档（deploy/profile.json）",
+  "description": "单一真源：模式不是环境变量，而是一个提交进仓库的配置文件。模式互斥规则（cross-field）由 scripts/build-profile.mjs 执行，此处仅编码静态结构。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["profileId", "mode", "management", "student"],
+  "properties": {
+    "profileId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "发布档标识，写进两端\"关于\"页，便于售后定位"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["offline", "online"],
+      "description": "offline | online"
+    },
+    "management": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["serverUrl", "allowDevServerOverride", "licenseVerifyKeys", "clockGuard"],
+      "properties": {
+        "serverUrl": {
+          "type": ["string", "null"],
+          "description": "online 必填；offline 必须为 null（互斥规则在脚本内强制）"
+        },
+        "allowDevServerOverride": {
+          "type": "boolean",
+          "description": "仅 dev 生效：渲染层是否可覆盖 serverUrl"
+        },
+        "updateUrl": {
+          "type": ["string", "null"],
+          "description": "自动更新检查源：GET 该地址返回 latest.json（{version,notes,downloadUrl,mandatory}）。offline 可为 null（无更新通道）或指向静态托管"
+        },
+        "licenseVerifyKeys": {
+          "type": "array",
+          "description": "offline 必填：服务商签名公钥（可多把，支持轮换）",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["keyId", "publicKeyJwk"],
+            "properties": {
+              "keyId": { "type": "string", "minLength": 1 },
+              "publicKeyJwk": { "$ref": "#/$defs/jwk" }
+            }
+          }
+        },
+        "clockGuard": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled", "toleranceMs"],
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "toleranceMs": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "student": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["serverBaseUrl", "offlineUnits", "localVault"],
+      "properties": {
+        "serverBaseUrl": {
+          "type": ["string", "null"],
+          "description": "online 必填；offline 必须为 null（互斥规则在脚本内强制）"
+        },
+        "offlineUnits": {
+          "type": "array",
+          "description": "offline 必填：本次发布内置哪些单位",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["unitId", "configId", "keyId", "batch"],
+            "properties": {
+              "unitId": { "type": "string", "minLength": 1 },
+              "configId": {
+                "type": "string",
+                "minLength": 1,
+                "description": "对应 server/contracts/seed/<configId>.json"
+              },
+              "keyId": {
+                "type": "string",
+                "minLength": 1,
+                "description": "对应 deploy/offline-keys/<keyId>.pub.json"
+              },
+              "batch": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["year", "semester", "isTest", "seq", "applyStartAt", "applyEndAt"],
+                "properties": {
+                  "year": { "type": "integer", "minimum": 2000, "maximum": 2100 },
+                  "semester": { "type": "integer", "enum": [1, 2] },
+                  "isTest": { "type": "boolean" },
+                  "seq": { "type": "integer", "minimum": 1 },
+                  "applyStartAt": { "type": ["integer", "null"], "description": "申请窗口，epoch 毫秒；null 表示未设" },
+                  "applyEndAt": { "type": ["integer", "null"], "description": "申请窗口，epoch 毫秒；null 表示未设" }
+                }
+              }
+            }
+          }
+        },
+        "localVault": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled", "secretRef", "version"],
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "secretRef": { "type": "string", "minLength": 1 },
+            "version": { "type": "integer", "minimum": 1 }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "jwk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kty", "n", "e"],
+      "properties": {
+        "kty": { "type": "string", "const": "RSA" },
+        "n": { "type": "string", "minLength": 1 },
+        "e": { "type": "string", "minLength": 1 },
+        "alg": { "type": "string" },
+        "key_ops": { "type": "array", "items": { "type": "string" } },
+        "ext": { "type": "boolean" }
+      }
+    }
+  }
+}

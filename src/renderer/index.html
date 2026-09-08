@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>学生综合素质测评管理系统</title>
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:"
+    />
+  </head>
+
+  <body>
+    <!-- isolate：将 Nuxt UI 样式隔离在应用内，避免弹层/堆叠上下文冲突 -->
+    <div id="app" class="isolate"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
