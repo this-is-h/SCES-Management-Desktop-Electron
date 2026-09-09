@@ -280,12 +280,8 @@ export async function createBatch(
     applyEndAt: input.applyEndAt
   })
 
-  // 离线学生端只内置第 1 个批次的申请公钥；seq>1 收不到申请（用户提示，13 §5）。
   const warnings: string[] = []
   if (!published) warnings.push('批次已在本地创建，但在线状态尚未同步，联网后将自动重试')
-  if (gateway.mode === 'offline' && seq > 1) {
-    warnings.push('离线学生端只会生成第 1 个批次的申请文件，本批次将收不到申请')
-  }
   return { batch, warnings }
 }
 

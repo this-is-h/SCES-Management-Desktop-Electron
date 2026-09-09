@@ -1,11 +1,15 @@
 /**
  * SQLite 数据库初始化与迁移。
  * 多账号：每个账号（单位）一个独立目录 userData/data/accounts/<unitId>/dms.db，
- * 业务数据与审计日志按账号天然隔离。WAL 模式，外键约束开启。
+ * 业务数据与审计日志按账号天然隔离。外键约束开启。
+ *
+ * 静态加密：库文件使用 SQLCipher（better-sqlite3-multiple-ciphers）全库加密，
+ * 密钥由 db-key.ts 通过 Electron safeStorage（Windows DPAPI）保管，文件型读取工具
+ * 无法直接读出内容。存量明文库在首启时经 rekey 原位加密（一次性自动迁移）。
  */
-import Database from 'better-sqlite3'
+import Database from 'better-sqlite3-multiple-ciphers'
 import { app } from 'electron'
-import { mkdirSync, existsSync, readFileSync, renameSync, unlinkSync } from 'fs'
+import { mkdirSync, existsSync, readFileSync, renameSync, unlinkSync, statSync } from 'fs'
 import { dirname, join } from 'path'
 import { MIGRATIONS } from './schema'
 import {
@@ -16,6 +20,7 @@ import {
   setActiveAccount,
   syncActiveActivation
 } from '../services/accounts'
+import { loadOrCreateDbKey } from '../services/db-key'
 
 let db: Database.Database | null = null
 
@@ -30,6 +35,53 @@ export function getDbPath(): string {
   const acc = getActiveAccount()
   if (!acc) throw new Error('无激活账号')
   return accountDbPath(acc.accountId)
+}
+
+/**
+ * 用密钥打开一个已加密的连接。SQLCipher 在 key 设置前不得执行任何语句，
+ * 设置后首次查询即校验密钥（错误密钥/明文库打开均抛 "file is not a database"）。
+ */
+export function openEncryptedConnection(dbPath: string, key: string): Database.Database {
+  const conn = new Database(dbPath)
+  conn.pragma(`key = '${key}'`)
+  conn.pragma('cipher_memory_security = ON')
+  conn.prepare('SELECT 1').get()
+  return conn
+}
+
+/** 探测文件是否为未加密的 SQLite 库（决定是否执行一次性 rekey 迁移）。 */
+function isPlaintextSqliteFile(dbPath: string): boolean {
+  if (!existsSync(dbPath)) return false
+  try {
+    const probe = new Database(dbPath, { readonly: true })
+    try {
+      probe.prepare('SELECT 1').get()
+      return true
+    } finally {
+      probe.close()
+    }
+  } catch {
+    return false
+  }
+}
+
+/** 把存量明文库原位加密（rekey，SQLCipher 页级重写；迁移前无需复制备份）。 */
+function encryptPlaintextInPlace(dbPath: string, key: string): void {
+  // rekey 原位加密：把整个库文件改写为加密页。任何失败都会向上抛，由 openDb 给用户可见提示。
+  const conn = new Database(dbPath)
+  try {
+    conn.pragma('cipher_memory_security = ON')
+    conn.pragma(`rekey = '${key}'`)
+    // 迁移后立即校验可读性（密钥正确、schema 可读才算成功）
+    conn.prepare('SELECT name FROM sqlite_master LIMIT 1').get()
+  } finally {
+    conn.close()
+  }
+  // 清理 rekey 前的滚动日志残留（SQLCipher 重写后旧的 journal/wal 已无意义且不可读）
+  for (const suffix of ['-journal', '-wal', '-shm']) {
+    const f = dbPath + suffix
+    if (existsSync(f)) unlinkSync(f)
+  }
 }
 
 /**
@@ -92,7 +144,9 @@ function repairLegacyScoreCategories(database: Database.Database): void {
 
   database.transaction(() => {
     for (const template of templates) {
-      let dyf: { categories?: Array<{ code?: string; groups?: Array<{ items?: Array<{ code?: string }> }> }> }
+      let dyf: {
+        categories?: Array<{ code?: string; groups?: Array<{ items?: Array<{ code?: string }> }> }>
+      }
       try {
         dyf = JSON.parse(template.dyf) as typeof dyf
       } catch {
@@ -107,7 +161,11 @@ function repairLegacyScoreCategories(database: Database.Database): void {
           }
         }
       }
-      const rows = selectRows.all(template.id) as Array<{ id: number; itemCode: string; category: string }>
+      const rows = selectRows.all(template.id) as Array<{
+        id: number
+        itemCode: string
+        category: string
+      }>
       for (const row of rows) {
         const expected = categoryByItem.get(row.itemCode)
         if (expected && expected !== row.category) update.run(expected, row.id)
@@ -123,7 +181,20 @@ export function openDb(dbPath: string): Database.Database {
     db = null
   }
   mkdirSync(dirname(dbPath), { recursive: true })
-  db = new Database(dbPath)
+  const { key } = loadOrCreateDbKey()
+
+  try {
+    db = openEncryptedConnection(dbPath, key)
+  } catch {
+    // 带密钥打不开：可能是首次升级的存量明文库 → 一次性 rekey 加密；也可能文件损坏。
+    if (isPlaintextSqliteFile(dbPath)) {
+      encryptPlaintextInPlace(dbPath, key)
+      db = openEncryptedConnection(dbPath, key)
+    } else {
+      throw new Error('数据库无法打开或已损坏，请尝试重启应用或联系服务商')
+    }
+  }
+
   migrate(db)
   seedTemplates(db)
   // 幂等修复旧的“分类名称污染”（早期一键补全基础分把分类名称写进 dyf_score.category，
@@ -171,7 +242,13 @@ export function migrateLegacyIfNeeded(): void {
     legacy = null
 
     // 建立账号索引并把旧库文件整体迁移到账号目录
-    upsertAccount({ accountId: unit.id, unitId: unit.id, name: unit.name, unitType: unit.unitType, role: 'level1' })
+    upsertAccount({
+      accountId: unit.id,
+      unitId: unit.id,
+      name: unit.name,
+      unitType: unit.unitType,
+      role: 'level1'
+    })
     const target = accountDbPath(unit.id)
     mkdirSync(dirname(target), { recursive: true })
     renameSync(legacyPath, target)
@@ -185,6 +262,83 @@ export function migrateLegacyIfNeeded(): void {
     // 迁移失败不阻塞启动（按未激活处理，用户重新激活）
     if (legacy) legacy.close()
   }
+}
+
+/** SQL 标识符加引号（防注入，仅用于内部拼接的表/列名）。 */
+function quoteIdent(name: string): string {
+  return `"${String(name).replace(/"/g, '""')}"`
+}
+
+/**
+ * 导出当前激活账号数据库的明文副本（开发者调试专用）。
+ * 逻辑级转储：建表 → 逐表拷数据（含 sqlite_sequence 计数）→ 索引/触发器/视图 → user_version。
+ * 输出为标准明文 SQLite 文件，可用任意 SQLite 工具直接打开。
+ * 调用方必须先通过 db-debug 的调试会话门禁。
+ */
+export function dumpActiveDbPlaintext(targetPath: string): { path: string; bytes: number } {
+  const acc = getActiveAccount()
+  if (!acc) throw new Error('无激活账号')
+  const srcPath = accountDbPath(acc.accountId)
+  if (!existsSync(srcPath)) throw new Error('数据库文件不存在')
+  const { key } = loadOrCreateDbKey()
+  const src = openEncryptedConnection(srcPath, key)
+  try {
+    const objects = src
+      .prepare(
+        `SELECT type, name, sql FROM sqlite_master
+         WHERE name NOT LIKE 'sqlite_%' ORDER BY CASE type WHEN 'table' THEN 0 ELSE 1 END`
+      )
+      .all() as Array<{ type: string; name: string; sql: string | null }>
+    const target = new Database(targetPath)
+    try {
+      target.transaction(() => {
+        // 1. 表结构（顺序含 AUTOINCREMENT 依赖，按 sqlite_master 原生顺序）
+        for (const obj of objects) {
+          if (obj.type === 'table' && obj.sql) target.exec(obj.sql)
+        }
+        // 2. 表数据
+        for (const obj of objects) {
+          if (obj.type !== 'table') continue
+          const cols = (
+            src.prepare(`PRAGMA table_info(${quoteIdent(obj.name)})`).all() as Array<{
+              name: string
+            }>
+          ).map((c) => c.name)
+          if (!cols.length) continue
+          const rows = src.prepare(`SELECT * FROM ${quoteIdent(obj.name)}`).all()
+          if (!rows.length) continue
+          const insert = target.prepare(
+            `INSERT INTO ${quoteIdent(obj.name)} (${cols.map(quoteIdent).join(', ')}) VALUES (${cols.map(() => '?').join(', ')})`
+          )
+          for (const row of rows) {
+            insert.run(...cols.map((c) => (row as Record<string, unknown>)[c]))
+          }
+        }
+        // 3. AUTOINCREMENT 计数（sqlite_sequence 表已随目标库建表自动创建）
+        const seqRows = src.prepare('SELECT name, seq FROM sqlite_sequence').all() as Array<{
+          name: string
+          seq: number
+        }>
+        for (const row of seqRows) {
+          target
+            .prepare('INSERT INTO sqlite_sequence (name, seq) VALUES (?, ?)')
+            .run(row.name, row.seq)
+        }
+        // 4. 索引/触发器/视图
+        for (const obj of objects) {
+          if (obj.type === 'table' || !obj.sql) continue
+          target.exec(obj.sql)
+        }
+        // 5. schema 版本
+        target.pragma(`user_version = ${src.pragma('user_version', { simple: true })}`)
+      })()
+    } finally {
+      target.close()
+    }
+  } finally {
+    src.close()
+  }
+  return { path: targetPath, bytes: statSync(targetPath).size }
 }
 
 /** 内置配置模板文件（决策 #18/#38：励行书院默认配置 + 测试配置；由契约种子同步而来）。 */

@@ -115,7 +115,7 @@ export async function importApplyFiles(
 }
 
 /** Reads only the fixed prefix and JSON header; the encrypted frame body is not loaded for routing. */
-async function readContainerHeaderFromFile(filePath: string): Promise<{
+export async function readContainerHeaderFromFile(filePath: string): Promise<{
   header: ReturnType<typeof readDyfContainerHeader>
   frameOffset: number
   size: number

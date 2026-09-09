@@ -27,31 +27,12 @@ const api: DmsApi = {
     getLicense: () => ipcRenderer.invoke('unit:get-license'),
     getAccounts: () => ipcRenderer.invoke('unit:get-accounts'),
     activate: (input) => ipcRenderer.invoke('unit:activate', input),
-    getFingerprint: () => ipcRenderer.invoke('unit:get-fingerprint'),
-    pickLicense: () => ipcRenderer.invoke('unit:pick-license'),
-    inspectLicense: (filePath) => ipcRenderer.invoke('unit:inspect-license', filePath),
-    publishPubkey: () => ipcRenderer.invoke('unit:publish-pubkey'),
     switchAccount: (accountId) => ipcRenderer.invoke('unit:switch-account', accountId),
     rebindDevice: (reason) => ipcRenderer.invoke('unit:rebind-device', reason),
-    exportRebindRequest: (newFingerprint, reason) =>
-      ipcRenderer.invoke('unit:export-rebind-request', newFingerprint, reason),
     deactivate: () => ipcRenderer.invoke('unit:deactivate'),
     logout: () => ipcRenderer.invoke('unit:logout'),
     hasAccounts: () => ipcRenderer.invoke('unit:has-accounts'),
     resume: () => ipcRenderer.invoke('unit:resume'),
-    pickCert: () => ipcRenderer.invoke('unit:pick-cert'),
-    importCert: (filePath) => ipcRenderer.invoke('unit:import-cert', filePath),
-    getClassOptions: () => ipcRenderer.invoke('unit:get-class-options')
-  },
-  delegation: {
-    readiness: () => ipcRenderer.invoke('delegation:readiness'),
-    list: () => ipcRenderer.invoke('delegation:list'),
-    issueBatch: (input) => ipcRenderer.invoke('delegation:issue-batch', input),
-    reissue: (password) => ipcRenderer.invoke('delegation:reissue', password),
-    exportFile: (delegationId) => ipcRenderer.invoke('delegation:export', delegationId),
-    exportFiles: (delegationIds) => ipcRenderer.invoke('delegation:export-many', delegationIds),
-    revoke: (delegationId) => ipcRenderer.invoke('delegation:revoke', delegationId),
-    revokeMany: (delegationIds) => ipcRenderer.invoke('delegation:revoke-many', delegationIds)
   },
   batch: {
     list: () => ipcRenderer.invoke('batch:list'),
@@ -76,6 +57,10 @@ const api: DmsApi = {
     correctName: (batchId, studentId, newName) =>
       ipcRenderer.invoke('import:correct-name', batchId, studentId, newName)
   },
+  parse: {
+    pickFile: () => ipcRenderer.invoke('parse:pick-file'),
+    studentFile: (filePath) => ipcRenderer.invoke('parse:student-file', filePath)
+  },
   apply: {
     list: (batchId, options) => ipcRenderer.invoke('apply:list', batchId, options),
     detail: (batchId, applyId) => ipcRenderer.invoke('apply:detail', batchId, applyId),
@@ -84,7 +69,6 @@ const api: DmsApi = {
     setScore: (batchId, applyId, itemCode, finalScore) =>
       ipcRenderer.invoke('apply:set-score', batchId, applyId, itemCode, finalScore),
     confirmBatchExport: (batchId) => ipcRenderer.invoke('apply:batch-export', batchId),
-    revokeBatchExport: (batchId) => ipcRenderer.invoke('apply:batch-export-revoke', batchId),
     computeRanking: (batchId) => ipcRenderer.invoke('apply:compute-ranking', batchId)
   },
   overview: {
@@ -97,7 +81,10 @@ const api: DmsApi = {
     saveImage: (fileName, dataUrl) => ipcRenderer.invoke('export:save-image', fileName, dataUrl),
     batchData: (batchId) => ipcRenderer.invoke('export:batch-data', batchId),
     onBatchProgress: (callback) => {
-      const listener = (_e: Electron.IpcRendererEvent, progress: Parameters<NonNullable<Parameters<DmsApi['export']['onBatchProgress']>[0]>>[0]): void => callback(progress)
+      const listener = (
+        _e: Electron.IpcRendererEvent,
+        progress: Parameters<NonNullable<Parameters<DmsApi['export']['onBatchProgress']>[0]>>[0]
+      ): void => callback(progress)
       ipcRenderer.on('export:batch-progress', listener)
       return () => ipcRenderer.removeListener('export:batch-progress', listener)
     }
@@ -113,7 +100,7 @@ const api: DmsApi = {
   update: {
     check: (manual) => ipcRenderer.invoke('update:check', manual),
     onStatus: (callback) => ipcRenderer.on('update:status', (_e, payload) => callback(payload))
-  }
+  },
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

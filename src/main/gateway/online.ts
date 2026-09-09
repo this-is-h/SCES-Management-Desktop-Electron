@@ -1,9 +1,7 @@
 /**
- * 在线网关：服务端为权威。迁自 services/server-client.ts（决策 #29 补 Bearer；
- * 删除死代码 reportBatchOperation）。接口 4–9 的 HTTP 细节在 M-O5 补齐（07 §5），
- * 但调用点已在 M-O1 就位——本文件只需保证方法集与返回类型满足 AdminGateway。
- *
- * **离线产物里本文件整块被 Rollup 摇掉**（gateway/index.ts 用编译期常量三元选择实现）。
+ * 在线网关：服务端为权威（路径以 SCES-Server/contracts/openapi.yaml 为准）。
+ * 激活走授权码（POST /authorize），身份 = unitToken Bearer + X-Unit-Id/X-Install-Id；
+ * 申请密钥本地持有，公钥随激活即时上报（接口 2）。
  */
 import { is } from '@electron-toolkit/utils'
 import type { BatchStatus, UnitConfig } from '@sces/shared'
@@ -12,7 +10,6 @@ import { getInstallId } from '../services/license'
 import { getSetting } from '../services/settings'
 import { getCurrentApplyKey } from '../services/apply-key'
 import type {
-  ActivateInput,
   ActivateResult,
   AdminGateway,
   ApplyKeyMaterial,
@@ -20,8 +17,6 @@ import type {
   ApplyStatusesReport,
   ApplyStatusesResult,
   BatchPublicInput,
-  LicenseFilePreview,
-  PublishPubkeyResult,
   RebindResult,
   RemoteLicenseStatus
 } from './types'
@@ -32,7 +27,7 @@ function serverUrl(): string {
   return __DMS_SERVER_URL__
 }
 
-/** 统一请求头：身份标识 + unitToken Bearer（决策 #29）。 */
+/** 统一请求头：身份标识 + unitToken Bearer。 */
 function authHeaders(): Record<string, string> {
   const acc = getActiveAccount()
   const token = getSetting('activation')?.unitToken
@@ -44,11 +39,7 @@ function authHeaders(): Record<string, string> {
   }
 }
 
-/**
- * 统一 POST。把网络/HTTP/业务错误翻译成对用户友好的中文，
- * 不直接抛出系统状态文本（Not Found / Internal Server Error 等）。
- * 这段中文翻译沿用 server-client.ts，做得对，别改。
- */
+/** 统一 POST，把网络/HTTP/业务错误翻译成对用户友好的中文。 */
 async function post<T>(path: string, body: unknown): Promise<T> {
   let resp: Response
   try {
@@ -104,11 +95,7 @@ interface AuthorizeData {
 export const onlineGateway: AdminGateway = {
   mode: 'online',
 
-  async activate(input: ActivateInput): Promise<ActivateResult> {
-    if (input.kind !== 'license-code') {
-      // 二三级 .dysd 在线模式同样走文件本地验签（M-O1B）；一级在线用授权码。
-      throw new Error('下级授权（.dysd）的在线激活将在后续版本支持')
-    }
+  async activate(input: { code: string }): Promise<ActivateResult> {
     const code = input.code.trim()
     if (!code) throw new Error('授权码不能为空')
     const data = await post<AuthorizeData>('/api/v1/authorize', { code })
@@ -128,24 +115,18 @@ export const onlineGateway: AdminGateway = {
     }
   },
 
-  /** 在线用授权码，无授权文件可预览。 */
-  async inspectLicenseFile(): Promise<LicenseFilePreview | null> {
-    return null
-  },
-
-  async publishUnitPublicKey(): Promise<PublishPubkeyResult> {
+  async publishUnitPublicKey(): Promise<void> {
     const acc = getActiveAccount()
     const applyKey = getCurrentApplyKey()
     await post(`/api/v1/units/${acc?.unitId ?? ''}/public-key`, {
       keyId: applyKey.keyId,
       publicKeyJwk: applyKey.publicKeyJwk
     })
-    return { transport: 'http', exported: true }
   },
 
-  async requestRebind(newFingerprint: string, reason: string): Promise<RebindResult> {
-    await post('/api/v1/units/rebind', { newFingerprint, reason })
-    return { transport: 'http', message: '换机申请已提交，服务端将签发新授权码' }
+  async requestRebind(reason: string): Promise<RebindResult> {
+    await post('/api/v1/units/rebind', { reason })
+    return { message: '换机申请已提交，服务端将签发新授权码' }
   },
 
   async fetchLicenseStatus(): Promise<RemoteLicenseStatus | null> {

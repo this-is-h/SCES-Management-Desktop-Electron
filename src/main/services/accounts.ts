@@ -9,7 +9,7 @@ import { app } from 'electron'
 import { createHash } from 'crypto'
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'fs'
 import { dirname, join } from 'path'
-import type { LicenseScope } from '@sces/shared/license'
+import type { LicenseScope } from './settings'
 import { getSetting, setSetting, type ActivationState } from './settings'
 
 /** 授权级别。 */

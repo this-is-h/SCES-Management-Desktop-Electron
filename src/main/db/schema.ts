@@ -6,7 +6,7 @@
  */
 
 /** 当前 schema 版本（= MIGRATIONS 长度）。 */
-export const SCHEMA_VERSION = 17
+export const SCHEMA_VERSION = 18
 
 /** 迁移脚本：MIGRATIONS[i] 将 schema 从版本 i 升级到 i+1。 */
 export const MIGRATIONS: string[] = [
@@ -390,5 +390,25 @@ export const MIGRATIONS: string[] = [
   SELECT 'legacy:admin.imported:' || apply_id, batch_id, apply_id, 'admin', NULL, NULL,
          'admin.imported', imported_at, imported_at
   FROM apply WHERE imported_at IS NOT NULL;
+  `,
+  // v18：离线授权链下线（产品切纯在线，决策见 README 在线化说明）：
+  // 1) unit 的单位签发密钥列（public_key_jwk/private_key_jwk，RSA-PSS）仅服务离线授权签发
+  //    与委派（.dysk/.dysc/.dysd），随 unit-keys/unit-cert/delegation 一并下线 → 重建 unit 剥离两列；
+  // 2) unit_cert（.dysc 信任锚）与 delegation（.dysd 台账）为离线分级授权专用 → 整表删除。
+  //    申请密钥（apply_key）保留：学生 .dyf 解密仍需要（历史密钥轮换）。
+  `
+  DROP TABLE IF EXISTS unit_cert;
+  DROP TABLE IF EXISTS delegation;
+  CREATE TABLE unit_v18 (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    unit_type TEXT NOT NULL,
+    config_template_id TEXT REFERENCES config_template(id),
+    created_at INTEGER NOT NULL
+  );
+  INSERT INTO unit_v18 (id, name, unit_type, config_template_id, created_at)
+    SELECT id, name, unit_type, config_template_id, created_at FROM unit;
+  DROP TABLE unit;
+  ALTER TABLE unit_v18 RENAME TO unit;
   `
 ]

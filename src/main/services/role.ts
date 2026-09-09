@@ -4,7 +4,7 @@
  * scope 是安全边界,所有列表/统计查询必须据此在主进程过滤(dual-mode/12 §5.4)。
  */
 import type { AuditRole } from '@sces/shared'
-import type { LicenseScope } from '@sces/shared/license'
+import type { LicenseScope } from './settings'
 import { getActiveAccount } from './accounts'
 import { writeAudit } from './audit'
 import { getSetting } from './settings'
