@@ -30,7 +30,7 @@
     "gen:update-manifest": "node scripts/gen-update-manifest.mjs"
   },
   "dependencies": {
-    "@sces/shared": "file:../SCES-Shared",
+    "@sces/shared": "git+https://github.com/this-is-h/SCES-Shared.git#semver:^0.1.0",
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
     "@tanstack/vue-table": "^8.21.3",
@@ -40,7 +40,6 @@
     "jszip": "^3.10.1"
   },
   "devDependencies": {
-    "@sces/contracts": "file:../SCES-Server/contracts",
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
     "@electron-toolkit/eslint-config-prettier": "3.0.0",

@@ -23,10 +23,16 @@ jobs:
           # Release 说明生成需要 tag 区间。
           fetch-depth: 0
 
-      - name: 配置私有依赖认证（@sces/shared / @sces/contracts git 依赖 + SCES-Web-Vercel 推送）
+      - name: 配置私有依赖认证（@sces/shared git 依赖）
         run: git config --global url."https://x-access-token:${SCES_CI_TOKEN}@github.com/".insteadOf "https://github.com/"
         env:
           SCES_CI_TOKEN: ${{ secrets.SCES_CI_TOKEN }}
+
+      - name: 拉取契约种子（SCES-Server）
+        # 契约种子源：SCES-Server 仓库 contracts/seed（sync-seed-templates SRC 多候选）
+        run: |
+          git clone --depth 1 --branch v0.1.0 "https://github.com/this-is-h/SCES-Server.git" sces-server-checkout
+          echo "SCES_CONTRACTS_SEED=${GITHUB_WORKSPACE}/sces-server-checkout/contracts/seed" >> "$GITHUB_ENV"
 
       - name: 安装 pnpm
         uses: pnpm/action-setup@v4
@@ -56,15 +62,15 @@ jobs:
         run: node scripts/gen-update-manifest.mjs
 
       - name: 推送 latest.json 到 SCES-Server（版本元数据仓库）
-        # SCES-Web-Vercel 是独立仓库，Vercel git 集成绑定它的 main 分支；
-        # latest.json 必须落在 SCES-Web-Vercel 的 main 才能触发部署。
+        # 版本元数据归属 SCES-Server（updates/latest.json），管理端 updater 与
+        # 下载页经 https://sces.thisish.cn/updates/latest.json 读取（Fastify 静态托管）。
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git clone --depth 1 "https://x-access-token:${SCES_CI_TOKEN}@github.com/this-is-h/SCES-Server.git" web-repo
-          cp dist-update/latest.json web-repo/updates/latest.json
-          cd web-repo
-          git add public/updates/latest.json
+          git clone --depth 1 "https://x-access-token:${SCES_CI_TOKEN}@github.com/this-is-h/SCES-Server.git" sces-server-updates
+          cp dist-update/latest.json sces-server-updates/updates/latest.json
+          cd sces-server-updates
+          git add updates/latest.json
           if git diff --cached --quiet; then
             echo "latest.json 无变更，跳过推送"
           else

@@ -38,11 +38,17 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - name: 配置私有依赖认证（@sces/shared / @sces/contracts 为 git 依赖）
+      - name: 配置私有依赖认证（@sces/shared git 依赖）
         if: ${{ secrets.SCES_CI_TOKEN != '' }}
         run: git config --global url."https://x-access-token:${SCES_CI_TOKEN}@github.com/".insteadOf "https://github.com/"
         env:
           SCES_CI_TOKEN: ${{ secrets.SCES_CI_TOKEN }}
+      - name: 拉取契约种子（SCES-Server）
+        # 契约种子源：SCES-Server 仓库 contracts/seed（sync-seed-templates SRC 多候选，
+        # 无本地 sibling 时读 SCES_CONTRACTS_SEED）
+        run: |
+          git clone --depth 1 --branch v0.1.0 "https://github.com/this-is-h/SCES-Server.git" sces-server-checkout
+          echo "SCES_CONTRACTS_SEED=${GITHUB_WORKSPACE}/sces-server-checkout/contracts/seed" >> "$GITHUB_ENV"
       - run: pnpm install --frozen-lockfile
       - name: 编译门禁
         run: pnpm build

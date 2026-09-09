@@ -24,9 +24,14 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-// 契约种子经 @sces/contracts 包（git 依赖）引入，见根 package.json devDependencies；
-// 本地开发用 ../SCES-Server/contracts 的 file: 依赖（pnpm 软链到 node_modules）。
-const SRC = path.join(ROOT, 'node_modules', '@sces', 'contracts', 'seed')
+// 契约种子来源（多候选，按优先级）：
+//   1) 环境变量 SCES_CONTRACTS_SEED（CI 用 token clone SCES-Server 后指向 contracts/seed）
+//   2) 本地兄弟仓库 ../SCES-Server/contracts/seed（开发机）
+//   3) 已安装的 @sces/contracts 包（历史兼容）
+const SRC = process.env.SCES_CONTRACTS_SEED
+    ?? (existsSync(path.join(ROOT, '..', 'SCES-Server', 'contracts', 'seed'))
+        ? path.join(ROOT, '..', 'SCES-Server', 'contracts', 'seed')
+        : path.join(ROOT, 'node_modules', '@sces', 'contracts', 'seed'))
 const DST = path.join(ROOT, 'resources', 'templates')
 
 /** 需同步到管理端的契约种子（与 management db/index.ts 的 SEED_TEMPLATE_FILES 对应）。 */
