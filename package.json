@@ -21,8 +21,8 @@
     "postinstall": "electron-builder install-app-deps",
     "sync:seed-templates": "node scripts/sync-seed-templates.mjs",
     "check:seed-templates": "node scripts/sync-seed-templates.mjs --check",
-    "build:unpack": "pnpm run build && electron-builder install-app-deps --force && electron-builder --dir",
-    "build:win": "pnpm run build && electron-builder install-app-deps --force && node ./scripts/electron-builder.mjs --win",
+    "build:unpack": "pnpm run build && electron-builder install-app-deps && electron-builder --dir",
+    "build:win": "pnpm run build && electron-builder install-app-deps && node ./scripts/electron-builder.mjs --win",
     "build:mac": "pnpm run build && electron-builder --mac",
     "build:linux": "pnpm run build && electron-builder --linux",
     "verify:licenses": "node scripts/verify-licenses.mjs",
@@ -30,11 +30,11 @@
     "gen:update-manifest": "node scripts/gen-update-manifest.mjs"
   },
   "dependencies": {
-    "@sces/shared": "git+https://github.com/this-is-h/SCES-Shared.git#semver:^0.1.0",
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
+    "@sces/shared": "git+https://github.com/this-is-h/SCES-Shared.git#semver:^0.1.0",
     "@tanstack/vue-table": "^8.21.3",
-    "better-sqlite3": "^12.2.0",
+    "better-sqlite3-multiple-ciphers": "^12.11.1",
     "electron-updater": "^6.3.9",
     "exceljs": "^4.4.0",
     "jszip": "^3.10.1"
@@ -72,7 +72,7 @@
       "unzipper": "0.12.5"
     },
     "onlyBuiltDependencies": [
-      "better-sqlite3",
+      "better-sqlite3-multiple-ciphers",
       "electron",
       "electron-winstaller",
       "esbuild",

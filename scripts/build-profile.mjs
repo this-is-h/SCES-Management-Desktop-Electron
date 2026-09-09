@@ -8,18 +8,16 @@
  * 职责边界（保持单一职责）：
  *   输入：deploy/profile.json + deploy/profile.schema.json
  *   输出：无（纯校验；--check 供 CI 比对，--apply 供构建链调用）
- *   不负责：编译、打包、学生端注入（学生端 runtime/active 注入脚本已随仓库拆分
- *   移至 SCES-User-Wechat，在线化（M5）后由服务端下发配置替代）
+ *   不负责：编译、打包（学生端注入已随仓库拆分移至 SCES-User-Wechat，在线化后由服务端下发配置）
  *
  * 用法：
  *   node scripts/build-profile.mjs --apply   # 校验（构建链前置门禁）
  *   node scripts/build-profile.mjs --check   # 校验（CI，不写文件）
  *
- * 模式规则（在线版方向）：
- *   - online：management.serverUrl 必须为 https URL（dev 允许 http://127.0.0.1）；
- *   - management.updateUrl 可选但必须是 https（到位后自动更新通道才有意义）。
- *   - 离线授权链（licenseVerifyKeys / offlineUnits / localVault 密钥材料）不再校验：
- *     离线交付已停止维护，相关设施随迁移退役；如 profile 仍含这些字段则仅做 schema 校验。
+ * 规则（在线版，唯一交付形态）：
+ *   - management.serverUrl 必须为 https URL（dev 允许 http://127.0.0.1）；
+ *   - management.updateUrl 可选但必须为字符串或 null。
+ *   - 离线授权链字段（mode/licenseVerifyKeys/offlineUnits/localVault）已从 schema 移除。
  */
 import { readFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
@@ -108,24 +106,17 @@ async function main() {
   const errors = []
   validateNode(schema, profile, '$', schema, errors)
 
-  const mode = profile.mode
-  if (mode === 'online') {
-    const url = profile.management?.serverUrl
-    const ok =
-      typeof url === 'string' &&
-      (url.startsWith('https://') ||
-        url.startsWith('http://127.0.0.1') ||
-        url.startsWith('http://localhost'))
-    if (!ok) errors.push('online 模式：management.serverUrl 必须为 https URL（dev 允许 http://127.0.0.1）')
-    const update = profile.management?.updateUrl
-    if (update != null && typeof update !== 'string') {
-      errors.push('management.updateUrl 必须为字符串或 null')
-    }
-  } else if (mode === 'offline') {
-    // 离线档不再作为交付目标：仅提示，不做 licenseVerifyKeys/offlineUnits 强制校验
-    console.warn('[build-profile] 注意：profile.mode=offline，离线交付已停止维护，构建将按 history 兼容处理')
-  } else {
-    errors.push(`mode 非法：${mode}`)
+  // 在线版（唯一交付形态）：服务端地址必须为 https URL（dev 允许 http://127.0.0.1/localhost）。
+  const url = profile.management?.serverUrl
+  const ok =
+    typeof url === 'string' &&
+    (url.startsWith('https://') ||
+      url.startsWith('http://127.0.0.1') ||
+      url.startsWith('http://localhost'))
+  if (!ok) errors.push('management.serverUrl 必须为 https URL（dev 允许 http://127.0.0.1）')
+  const update = profile.management?.updateUrl
+  if (update != null && typeof update !== 'string') {
+    errors.push('management.updateUrl 必须为字符串或 null')
   }
 
   if (errors.length > 0) {
@@ -135,7 +126,7 @@ async function main() {
   }
 
   const action = DO_APPLY ? 'apply' : DO_CHECK ? 'check' : 'validate'
-  console.log(`[build-profile] 校验通过（${action}）：profileId=${profile.profileId} mode=${profile.mode}`)
+  console.log(`[build-profile] 校验通过（${action}）：profileId=${profile.profileId}`)
 }
 
 main().catch((error) => {

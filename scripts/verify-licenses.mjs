@@ -10,23 +10,18 @@
  *  3. 校验小程序包内通知副本与主文档一致（--sync 同步副本）。
  *
  * 用法：
- *  node scripts/verify-licenses.mjs          # 校验（失败即退出码 1）
- *  node scripts/verify-licenses.mjs --sync   # 校验 + 同步小程序通知副本
+ *  node scripts/verify-licenses.mjs   # 校验（失败即退出码 1）
  *
  * 说明：@noble/*、node-forge 是 @sces/shared 的 devDependencies，不进管理端安装包；
  * 脚本枚举范围覆盖全部已安装包（含 dev），任何未知许可都会报警——比"只查交付物"
  * 更严格，也覆盖未来打包配置变化。
  */
-import { existsSync, readdirSync, readFileSync, writeFileSync, statSync } from 'node:fs'
-import { dirname, join, relative, sep } from 'node:path'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const NOTICES = join(ROOT, 'THIRD_PARTY_NOTICES.md')
-// 小程序通知副本已随仓库拆分迁至 SCES-User-Wechat（miniprogram/THIRD_PARTY_NOTICES.md），
-// 由 SCES-User-Wechat 侧自持，本仓不再同步。
-const SYNC = process.argv.includes('--sync')
-
 /** 常规许可白名单（可直接分发，无需 in-doc 全文标记）。 */
 const PLAIN_LICENSES = new Set([
   'MIT',
@@ -48,7 +43,8 @@ const PLAIN_LICENSES = new Set([
   '(MIT OR CC0-1.0)',
   'Python-2.0',
   'MPL-2.0',
-  'CC-BY-4.0'
+  'CC-BY-4.0',
+  '(MIT OR Apache-2.0)'
 ])
 
 /**
@@ -73,7 +69,9 @@ const NOTICE_REQUIRED = new Map([
  */
 const UNLICENSED_EXEMPT = new Map([
   ['buffers@0.1.1', 'dev-only 传递依赖，上游未声明许可；不进分发产物'],
-  ['vaul-vue@0.4.1', 'dev-only 构建依赖（@nuxt/ui 传递），上游仓库声明 MIT 但 npm 包清单缺失 license 字段；不进分发产物']
+  ['vaul-vue@0.4.1', 'dev-only 构建依赖（@nuxt/ui 传递），上游仓库声明 MIT 但 npm 包清单缺失 license 字段；不进分发产物'],
+  ['@sces/shared@0.2.0', '本项目自有共享层（git 依赖，UNLICENSED/private），源码打包进应用'],
+  ['@sces/contracts@0.1.0', '本项目自有契约包（file/git 依赖，清单未声明许可），仅构建期同步种子用，不进分发产物']
 ])
 
 /** 不参与审计的目录：元目录。 */
@@ -122,7 +120,6 @@ function main() {
   const failures = []
   const packages = []
   collect(join(ROOT, 'node_modules', '.pnpm'), packages)
-  collect(join(ROOT, 'user', 'wechat', 'miniprogram', 'node_modules'), packages)
 
   const seen = new Map()
   for (const p of packages) {
@@ -141,11 +138,9 @@ function main() {
       }
       continue
     }
-    if (p.license === '(none)' && UNLICENSED_EXEMPT.has(key)) continue
+    if ((p.license === '(none)' || p.license === 'UNLICENSED') && UNLICENSED_EXEMPT.has(key)) continue
     failures.push(`依赖 ${key} 许可「${p.license}」不在白名单：请在 scripts/verify-licenses.mjs 显式处置（新增白名单 / 通知标记 / 豁免说明）`)
   }
-
-  // 小程序通知副本（SCES-User-Wechat/miniprogram/THIRD_PARTY_NOTICES.md）由 SCES-User-Wechat 自持，不再在本仓校验
 
   if (failures.length) {
     console.error(`✘ 许可校验失败（${failures.length} 项）：`)

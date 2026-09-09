@@ -16,6 +16,8 @@ export function useFileImport(opts: {
   getOverwrite?: () => boolean
   /** 覆盖导入前的二次确认（仅一级 .dxy 拖放生效）。返回 false 则中止导入。 */
   confirmOverwrite?: () => Promise<boolean> | boolean
+  /** 拖放是否启用（设置页等禁止拖入时传 false 判定）。 */
+  enabled?: () => boolean
   /** 导入完成后回调（刷新列表/冲突/大表格）。 */
   onImported?: () => void | Promise<void>
 }): {
@@ -28,7 +30,7 @@ export function useFileImport(opts: {
   const toast = useToast()
   const importing = ref(false)
   const results = ref<ImportFileResult[]>([])
-  const { dragging } = useFileDrop((files) => void importFiles(files))
+  const { dragging } = useFileDrop((files) => void importFiles(files), opts.enabled ?? (() => true))
 
   async function runPaths(paths: string[]): Promise<void> {
     const batchId = opts.getBatchId()

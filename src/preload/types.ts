@@ -2,7 +2,13 @@
  * preload 白名单 API 的类型契约：渲染进程通过 window.api 访问。
  * 输入/输出类型与主进程服务对齐，供 index.ts（实现）与 index.d.ts（全局声明）复用。
  */
-import type { ApplyStatus, AuditLog, Batch, ClassCascader, ConfirmLevel, TimelineEvent } from '@sces/shared'
+import type {
+  ApplyStatus,
+  AuditLog,
+  Batch,
+  ConfirmLevel,
+  TimelineEvent
+} from '@sces/shared'
 import type { UpdateCheckResult } from '../main/services/updater'
 export type { UpdateCheckResult }
 
@@ -34,72 +40,39 @@ export interface AccountInfo {
   lastUsedAt: number
 }
 
-/** 授权状态（过期只读 + 时钟回拨检测）。 */
+/** 授权状态（过期只读判定）。 */
 export interface LicenseStatus {
   activated: boolean
   expiresAt?: number
   expired: boolean
-  /** 时钟回拨检测（离线防篡改，dual-mode/03 §6）：本机记录的最近使用时间晚于当前时间。 */
-  rolledBack?: boolean
   /** 距到期剩余天数（已过期为 0）；用于 ≤30 天续期提示。 */
   daysRemaining?: number
 }
 
 /** 管理端能力矩阵（gateway/capabilities.ts 的单一真源；渲染层视图分支唯一依据）。 */
 export interface AdminCapabilities {
-  mode: 'offline' | 'online'
+  mode: 'online'
   profileId: string
-  unitActivation: 'license-code' | 'license-file'
-  serverUrlConfigurable: boolean
-  remoteLicenseRefresh: boolean
-  transport: 'http' | 'file'
-  showFingerprint: boolean
 }
 
-/** 激活输入：一级用授权码（online）或授权文件（offline）；二三级恒为授权文件（.dysd）。 */
-export type ActivateInput =
-  | { kind: 'license-code'; code: string; serverUrl?: string }
-  | { kind: 'license-file'; filePath: string; password: string }
-
-/** 授权文件预览（验签 + 读 header，不需口令）：激活页第一步展示。 */
-export interface LicenseFilePreview {
-  type: string
-  unitId: string
-  unitName: string
-  role: 'level1' | 'level2' | 'level3'
-  scope: { grade?: string; class?: string }
-  expiresAt: number
-  boundFingerprint: string | null
-  signKeyId: string
-}
-
-/** 公钥包（.dysk）导出结果。 */
-export interface PublishPubkeyResult {
-  transport: 'http' | 'file'
-  path?: string
-  exported: boolean
+/** 激活输入（在线版：授权码激活）。 */
+export interface ActivateInput {
+  code: string
+  serverUrl?: string
 }
 
 /** 激活信息（设置页展示）。 */
 export interface ActivationInfo {
   serverUrl?: string
   expiresAt?: number
-  mode?: 'offline' | 'online'
   role?: 'level1' | 'level2' | 'level3'
   scope?: { grade?: string; class?: string }
   licenseId?: string
-  delegationId?: string
   /** 当前申请密钥 keyId。 */
   keyId?: string
-  signKeyId?: string
-  /** 本机机器码。 */
-  fingerprint?: string
-  boundFingerprint?: string | null
   profileId?: string
   /** 配置版本 version.revision。 */
   configVersion?: string
-  /** 是否已导出过公钥包（.dysk）。 */
-  pubkeyExported?: boolean
 }
 
 /** 批次创建输入（计算规则与排名范围由模板决定）。 */
@@ -273,6 +246,96 @@ export interface RankingRow {
   rankMajor?: number
 }
 
+// ---------- 德育分文件解析（设置 → 文件解析，仅展示不改库） ----------
+
+/** 解析出的德育分明细行（展示用；分数为文件内申请分，不可修改）。 */
+export interface DyfParseScoreItem {
+  itemCode: string
+  /** 分类 code（模板未定义时为「未知」）。 */
+  categoryCode: string
+  /** 分类显示名。 */
+  categoryName: string
+  /** 项目描述（模板；未定义为「模板未定义项目」）。 */
+  description: string
+  /** 学生申请分。 */
+  appliedScore: number
+  /** 分值上限（模板 scoreType 推导）。 */
+  maxScore?: number
+  allowAdd: boolean
+  studentApplicable: boolean
+  negative: boolean
+  /** 是否配置模板定义条目。 */
+  templateItem: boolean
+  /** 证明材料（data URL；超限条目为占位值）。 */
+  evidence: string[]
+}
+
+/** 解析出的导出历史（时间信息）。 */
+export interface DyfParseExportEvent {
+  revision: number
+  exportedAt: number
+  fileHash?: string
+}
+
+/** 学生端 .dyf 文件解析结果（ok=false 时仅 fileName/error）。 */
+export type DyfParseStudentResult = DyfParseStudentOk | DyfParseStudentError
+
+/** 解析失败：密钥不匹配、文件损坏或格式不支持。 */
+export interface DyfParseStudentError {
+  fileName: string
+  ok: false
+  /** 中文原因（如「无法解析：文件使用的密钥与本机不匹配」）。 */
+  error: string
+}
+
+/** 解析成功：完整展示数据。 */
+export interface DyfParseStudentOk {
+  fileName: string
+  ok: true
+  /** 容器头（不解密即可读的元信息）。 */
+  header: {
+    schemaVersion: number
+    type: string
+    documentType: string
+    batchId?: string
+    keyId?: string
+    applyId?: string
+    revision?: number
+    algorithm: string
+    createdAt: number
+    frameCount: number
+    contentHash: string
+    assets: Array<{ assetId: string; mimeType: string; size: number; sha256: string }>
+  }
+  summary: {
+    applyId: string
+    revision: number
+    batchId: string
+    /** 基础信息（已知字段按序 + 其余透出）。 */
+    personal: Array<{ key: string; label: string; value: string }>
+    exportedAt?: number
+    enteredAt?: number
+    exports: DyfParseExportEvent[]
+    /** 文件内德育分明细合计。 */
+    totalScore: number
+  }
+  /** 德育分明细（仅文件内已申请项目）。 */
+  scores: DyfParseScoreItem[]
+  /** 确认单（data URL，可选）。 */
+  confirmSlip?: string
+  timeline: Array<{
+    eventId: string
+    action: string
+    occurredAt: number
+    revision?: number
+    sourceFileHash?: string
+  }>
+  /** 解密后的原始 payload（附在页面底部供核对）。 */
+  raw: unknown
+  /** payload 的 SHA-256（hex）。 */
+  payloadHash: string
+}
+
 /** 排名查询结果。 */
 export interface RankingListResult {
   items: RankingRow[]
@@ -343,66 +406,9 @@ export interface ScoreTableResult {
   total: number
 }
 
-/** 换机申请结果。 */
+/** 换机申请结果（online：服务端受理）。 */
 export interface RebindResult {
-  transport: 'http' | 'file'
-  /** offline 导出的 .dysr 路径。 */
-  path?: string
   message: string
-}
-
-/** 导入单位证书(.dysc)结果。 */
-export interface ImportCertResult {
-  /** 单位授权到期日(级联封顶下级有效期)。 */
-  notAfter: number
-  /** notAfter 与本地生效有效期不一致(提示续期未同步)。 */
-  expiryMismatch: boolean
-}
-
-/** "下级授权"页就绪状态:是否已导入单位证书。 */
-export interface DelegationReadiness {
-  ready: boolean
-  /** 单位授权到期日(= 下级有效期上限)。 */
-  notAfter?: number
-  /** 当前签发会携带的非草稿批次数（进行中 + 已结束）。 */
-  batchCount?: number
-}
-
-/** 下级授权台账条目。 */
-export interface DelegationRecord {
-  delegationId: string
-  role: 'level2' | 'level3'
-  scope: { grade?: string; class?: string }
-  holderLabel: string | null
-  boundFingerprint: string | null
-  expiresAt: number
-  issuedAt: number
-  reissuedAt: number | null
-  revokedAt: number | null
-  /** 本地是否保存了可直接导出的授权文件快照。 */
-  exportable?: boolean
-}
-
-/** 批量签发下级授权输入（多个范围共用有效期/口令；不绑设备）。 */
-export interface IssueDelegationBatchInput {
-  /** 选择的年级；每个年级自动签发一份 level2 和其全部班级 level3 授权。 */
-  grades: string[]
-  holderLabel?: string
-  expiresAt: number
-  password: string
-}
-
-/** 批量签发下级授权结果。 */
-export interface IssueDelegationBatchResult {
-  grades: number
-  classes: number
-  path: string
-}
-
-/** 批量重签结果。 */
-export interface ReissueResult {
-  reissued: number
-  path: string
 }
 
 /** 渲染进程可调用的白名单 API。 */
@@ -432,20 +438,10 @@ export interface DmsApi {
     getAccounts(): Promise<AccountInfo[]>
     /** 激活：授权码（online）或授权文件（offline，按文件 type 分派）。 */
     activate(input: ActivateInput): Promise<UnitInfo>
-    /** 本机机器码（离线授权绑定用；带一键复制）。 */
-    getFingerprint(): Promise<{ code: string }>
-    /** 打开授权文件选择框（.dysl/.dysd），取消返回 null。 */
-    pickLicense(): Promise<string | null>
-    /** 验签 + 读 header（不需口令）：激活前展示单位信息供确认，online 返回 null。 */
-    inspectLicense(filePath: string): Promise<LicenseFilePreview | null>
-    /** 导出公钥包（.dysk）交服务商换取单位证书；online 为 HTTP POST。 */
-    publishPubkey(): Promise<PublishPubkeyResult>
     /** 切换账号（切换后窗口重载）。 */
     switchAccount(accountId: string): Promise<void>
     /** online 换机：服务端作废旧码签发新码，本机随后注销回验证页。 */
     rebindDevice(reason?: string): Promise<void>
-    /** offline 换机：导出 .dysr 换机申请文件（不自动注销），取消返回 null。newFingerprint = 新设备机器码。 */
-    exportRebindRequest(newFingerprint: string, reason: string): Promise<RebindResult | null>
     /** 注销本机账号（删除本地数据，回未激活态）。 */
     deactivate(): Promise<void>
     /** 回到验证页（添加单位/账号用）：保留已有账号数据，仅切到未激活态。 */
@@ -454,31 +450,6 @@ export interface DmsApi {
     hasAccounts(): Promise<boolean>
     /** 从验证页返回最近使用的系统（不删数据）。 */
     resume(): Promise<void>
-    /** 打开单位证书选择框(.dysc),取消返回 null。 */
-    pickCert(): Promise<string | null>
-    /** 导入单位证书(.dysc,仅 level1):验签 + 核对后落库,方可签发下级授权。 */
-    importCert(filePath: string): Promise<ImportCertResult>
-    /** 当前单位班级级联(签发下级授权选数据范围用)。 */
-    getClassOptions(): Promise<ClassCascader>
-  }
-  /** M-O1B:下级授权(.dysd)签发与台账(仅 level1)。 */
-  delegation: {
-    /** 是否已导入单位证书(据此启用"签发下级授权")。 */
-    readiness(): Promise<DelegationReadiness>
-    /** 签发台账列表。 */
-    list(): Promise<DelegationRecord[]>
-    /** 按年级签发授权包（年级授权 + 全部班级授权），取消返回 null。 */
-    issueBatch(input: IssueDelegationBatchInput): Promise<IssueDelegationBatchResult | null>
-    /** 续期后按台账批量重签,导出到目录,取消返回 null。 */
-    reissue(password: string): Promise<ReissueResult | null>
-    /** 单独导出台账中保存的原授权文件。 */
-    exportFile(delegationId: string): Promise<string | null>
-    /** 把选中的授权文件导出为一个 zip。 */
-    exportFiles(delegationIds: string[]): Promise<string | null>
-    /** 本地作废(仅台账与审计,不影响已发出文件)。 */
-    revoke(delegationId: string): Promise<void>
-    /** 批量本地作废。 */
-    revokeMany(delegationIds: string[]): Promise<{ revoked: number }>
   }
   batch: {
     list(): Promise<Batch[]>
@@ -515,6 +486,13 @@ export interface DmsApi {
     /** 错误处理：修正学生姓名（仅一次）。 */
     correctName(batchId: string, studentId: string, newName: string): Promise<void>
   }
+  /** 设置 → 文件解析：解析德育分文件（.dyf），仅展示不改库。 */
+  parse: {
+    /** 弹出 .dyf 文件选择框（单选），取消返回 null。 */
+    pickFile(): Promise<string | null>
+    /** 解析学生端导出的 .dyf 申请文件（密钥不匹配返回 ok=false + 原因）。 */
+    studentFile(filePath: string): Promise<DyfParseStudentResult>
+  }
   /** M3：审核（扣分/加分/整班确认导出）。 */
   apply: {
     list(batchId: string, options?: ApplyListOptions): Promise<ApplyListResult>
@@ -535,7 +513,6 @@ export interface DmsApi {
       syncPending?: boolean
     }>
     /** 撤销整班导出（仅一级，留审计）：confirmed → reviewing，清除班级端审核标记。 */
-    revokeBatchExport(batchId: string): Promise<void>
     /** 手动计算排名（决策 #47）：重算 final_grade 与班排/专排，返回参与排名人数。 */
     computeRanking(batchId: string): Promise<{ rankedCount: number }>
   }
@@ -559,12 +536,14 @@ export interface DmsApi {
     saveImage(fileName: string, dataUrl: string): Promise<string | null>
     /** 重新导出本级数据 .dyf（issue #5：二级可无限制导出），返回路径或 null=取消。 */
     batchData(batchId: string): Promise<string | null>
-    onBatchProgress(callback: (progress: {
-      phase: 'prepare' | 'write' | 'finalize'
-      completedFrames: number
-      totalFrames: number
-      writtenBytes: number
-    }) => void): () => void
+    onBatchProgress(
+      callback: (progress: {
+        phase: 'prepare' | 'write' | 'finalize'
+        completedFrames: number
+        totalFrames: number
+        writtenBytes: number
+      }) => void
+    ): () => void
   }
   evidence: {
     /** 读证据文件为 data URL（审核详情展示），文件不存在返回 null。 */
@@ -585,4 +564,5 @@ export interface DmsApi {
     /** 订阅主进程推送的检查结果（自动检查或手动检查后）。 */
     onStatus(callback: (payload: UpdateCheckResult | null) => void): void
   }
+  /** 开发者调试（仅服务商：数据库加密后的明文导出通道）。用户界面隐藏，须持服务商票据。 */
 }

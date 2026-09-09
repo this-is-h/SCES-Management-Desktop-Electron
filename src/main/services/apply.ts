@@ -27,14 +27,12 @@ import { getTemplate } from './config-template'
 import { writeAudit } from './audit'
 import { assertWritable } from './license'
 import {
-  assertLevel1,
   confirmLevelForRole,
   currentRole,
   currentScope,
   outOfScopeReason
 } from './role'
 import { computeRanking, isRankingFresh, touchScoresChanged } from './ranking'
-import { gateway } from '../gateway'
 import { publishApplyStatusReliable, publishApplyStatusesReliable } from './status-outbox'
 import type {
   ApplyDetail,
@@ -674,51 +672,6 @@ export async function confirmBatchExport(
     detail: { status: 'confirmed', applyCount: pending.length }
   })
   return { confirmedCount: pending.length, syncPending: true }
-}
-
-/**
- * 撤销整班导出（仅一级可操作，留审计；架构 §4.1 撤销确认的批量形态）。
- * confirmed → reviewing，清空班级端审核标记与 final_grade（排名随之移除）。
- */
-export function revokeBatchExport(batchId: string): void {
-  assertWritable()
-  assertLevel1('apply.revoke-export')
-  if (gateway.mode === 'online') {
-    throw new Error('在线模式不支持撤销已确认批次，请由一级管理员发起新一轮审核')
-  }
-  const role = currentRole()
-  const db = getDb()
-  const batch = getBatch(batchId)
-  if (!batch) throw new Error('批次不存在')
-  if (!batch.classReviewedAt) throw new Error('该班尚未导出，无法撤销')
-
-  const revoked = (
-    db
-      .prepare(`SELECT COUNT(*) AS c FROM apply WHERE batch_id = ? AND status = 'confirmed'`)
-      .get(batchId) as { c: number }
-  ).c
-
-  const tx = db.transaction(() => {
-    db.prepare(
-      `UPDATE apply SET status = 'reviewing', confirm_level = NULL, confirm_by = NULL, confirm_at = NULL, dyf_confirmed_at = NULL
-       WHERE batch_id = ? AND status = 'confirmed'`
-    ).run(batchId)
-    db.prepare('DELETE FROM final_grade WHERE batch_id = ?').run(batchId)
-    db.prepare(
-      'UPDATE batch SET class_reviewed_at = NULL, ranked_at = NULL, scores_changed_at = ?, updated_at = ? WHERE id = ?'
-    ).run(Date.now(), Date.now(), batchId)
-  })
-  tx()
-
-  writeAudit({
-    batchId,
-    operator: 'local-admin',
-    role,
-    scope: 'unit',
-    action: 'apply.batch.export.revoke',
-    target: batchId,
-    detail: { revokedCount: revoked }
-  })
 }
 
 /** 读申请行（校验批次归属）。 */

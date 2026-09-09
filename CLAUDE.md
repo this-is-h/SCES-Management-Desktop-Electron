@@ -1,7 +1,7 @@
 # SCES-Management-Desktop-Electron — 管理端
 
 学生综合素质测评管理系统（SCES）· 管理端（Electron + Vue 3 + Nuxt UI + better-sqlite3）。
-当前离线优先实现，**在线化进行中**（对接 SCES-Server，M5）：`src/main/gateway/online.ts` 为在线网关骨架。
+**在线版**：本地 SQLCipher 库为分数/证明材料权威（服务端不存载荷），激活/授权/批次/状态经服务端（SCES-Server / SCES-Server-Vercel）同步；离线授权链（授权文件、机器码、委派、时钟守卫）已移除。
 
 ## 开发规范（必读，新会话遵守）
 
@@ -57,7 +57,7 @@
 - `pnpm build` 前置门禁：`sync-seed-templates`（契约种子逐字节一致）+ `build-profile --apply`（发布档校验）；
 - `@sces/shared` 以 TS 源码打包进 bundle（electron.vite.config.ts `externalizeDeps.exclude`），原生依赖保持 externalize；
 - 发布档一律改 `deploy/profile.json`（单一真源），服务端 API 地址与更新源（`https://sces.thisish.cn/updates/latest.json`）构建期注入；
-- 离线授权链路（授权文件、签发、机器码）随在线化转型逐步退役（模块级下线由 M5 推进，不在本仓拆分中删代码）。
+- 授权/批次/申请状态经 gateway online 上报；申请密钥本地持有（解密历史 .dyf），公钥随激活上报。
 
 ## 命令（仓库根）
 

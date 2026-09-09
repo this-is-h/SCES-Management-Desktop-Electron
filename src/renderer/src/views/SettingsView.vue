@@ -2,19 +2,17 @@
 import { onMounted, ref } from 'vue'
 import { useToast } from '@nuxt/ui/composables'
 import { useTheme } from '../composables/useTheme'
+import DyfParseView from './DyfParseView.vue'
 import type {
   ThemeMode,
   DataDirInfo,
   AccountInfo,
   AdminCapabilities,
   ActivationInfo,
-  LicenseFilePreview,
   UpdateCheckResult
 } from '../../../preload/types'
 import { ipcErrorMessage } from '../utils/ipc'
 import { fullUnitName } from '../utils/unit-name'
-import { bumpLicenseRefresh } from '../stores/license-state'
-import GuardedButton from '../components/GuardedButton.vue'
 
 const props = withDefaults(defineProps<{ tab?: string }>(), { tab: 'settings-general' })
 
@@ -44,20 +42,8 @@ const accounts = ref<AccountInfo[]>([])
 const caps = ref<AdminCapabilities | null>(null)
 const activation = ref<ActivationInfo | null>(null)
 const unitName = ref('')
-const rolledBack = ref(false)
-
-// 离线：导出公钥包 / 注销 / 换机 / 更新授权
-const pubkeyBusy = ref(false)
+// 注销与换机（在线）
 const deactivateOpen = ref(false)
-const rebindOfflineOpen = ref(false)
-const newFingerprint = ref('')
-const rebindReason = ref('')
-const renewOpen = ref(false)
-const renewPath = ref('')
-const renewPreview = ref<LicenseFilePreview | null>(null)
-const renewPassword = ref('')
-const renewBusy = ref(false)
-const renewError = ref('')
 
 onMounted(async () => {
   try {
@@ -68,7 +54,6 @@ onMounted(async () => {
   try {
     const lic = await window.api.unit.getLicense()
     expiresAt.value = lic.expiresAt
-    rolledBack.value = lic.rolledBack === true
   } catch {
     // 忽略
   }
@@ -151,34 +136,6 @@ function roleLabel(role?: AccountInfo['role']): string {
   return map[role] ?? role
 }
 
-/** 复制机器码到剪贴板。 */
-async function copyFingerprint(): Promise<void> {
-  if (!activation.value?.fingerprint) return
-  await navigator.clipboard.writeText(activation.value.fingerprint)
-  toast.add({ title: '已复制机器码', color: 'success' })
-}
-
-/** 导出单位公钥包（.dysk）交服务商换取单位证书。 */
-async function onPublishPubkey(): Promise<void> {
-  pubkeyBusy.value = true
-  try {
-    const res = await window.api.unit.publishPubkey()
-    if (res.exported) {
-      toast.add({
-        title: '公钥包已导出',
-        description: '请发送给服务商换取单位证书',
-        color: 'success'
-      })
-      if (activation.value) activation.value.pubkeyExported = true
-      bumpLicenseRefresh()
-    }
-  } catch (err) {
-    toast.add({ title: '导出失败', description: ipcErrorMessage(err), color: 'error' })
-  } finally {
-    pubkeyBusy.value = false
-  }
-}
-
 /** 注销本机账号（删除本地数据，回未激活态；主进程随后重载窗口）。 */
 async function onDeactivate(): Promise<void> {
   deactivateOpen.value = false
@@ -186,74 +143,6 @@ async function onDeactivate(): Promise<void> {
     await window.api.unit.deactivate()
   } catch (err) {
     toast.add({ title: '操作失败', description: ipcErrorMessage(err), color: 'error' })
-  }
-}
-
-/** 离线换机：导出 .dysr 换机申请文件（不注销本机）。 */
-async function onExportRebind(): Promise<void> {
-  if (!newFingerprint.value.trim()) {
-    toast.add({ title: '请填写新设备机器码', color: 'warning' })
-    return
-  }
-  rebinding.value = true
-  try {
-    const res = await window.api.unit.exportRebindRequest(
-      newFingerprint.value.trim(),
-      rebindReason.value.trim()
-    )
-    if (res) {
-      rebindOfflineOpen.value = false
-      newFingerprint.value = ''
-      rebindReason.value = ''
-      toast.add({ title: '换机申请已导出', description: res.message, color: 'success' })
-    }
-  } catch (err) {
-    toast.add({ title: '操作失败', description: ipcErrorMessage(err), color: 'error' })
-  } finally {
-    rebinding.value = false
-  }
-}
-
-/** 更新授权（续期）：选择新授权文件 → 验签预览。 */
-async function onPickRenew(): Promise<void> {
-  renewError.value = ''
-  try {
-    const path = await window.api.unit.pickLicense()
-    if (!path) return
-    renewPath.value = path
-    renewPreview.value = await window.api.unit.inspectLicense(path)
-  } catch (err) {
-    renewError.value = ipcErrorMessage(err)
-    renewPreview.value = null
-  }
-}
-
-/** 确认更新授权：口令解封激活（走幂等分支，仅更新有效期/配置）。 */
-async function onRenew(): Promise<void> {
-  renewError.value = ''
-  if (!renewPath.value) {
-    renewError.value = '请先选择授权文件'
-    return
-  }
-  renewBusy.value = true
-  try {
-    await window.api.unit.activate({
-      kind: 'license-file',
-      filePath: renewPath.value,
-      password: renewPassword.value
-    })
-    toast.add({ title: '授权已更新', color: 'success' })
-    renewOpen.value = false
-    renewPath.value = ''
-    renewPreview.value = null
-    renewPassword.value = ''
-    const lic = await window.api.unit.getLicense()
-    expiresAt.value = lic.expiresAt
-    activation.value = await window.api.unit.getActivationInfo()
-  } catch (err) {
-    renewError.value = ipcErrorMessage(err)
-  } finally {
-    renewBusy.value = false
   }
 }
 
@@ -274,7 +163,11 @@ async function onCheckUpdate(manual = true): Promise<void> {
       })
     } else if (res.hasUpdate) {
       const kind = res.mandatory ? '发现新版本（强制更新）' : '发现新版本'
-      toast.add({ title: kind, description: `当前 ${res.current} → 最新 ${res.latest}`, color: 'success' })
+      toast.add({
+        title: kind,
+        description: `当前 ${res.current} → 最新 ${res.latest}`,
+        color: 'success'
+      })
     } else {
       toast.add({ title: '已是最新版本', description: `当前版本 ${res.current}`, color: 'success' })
     }
@@ -399,7 +292,9 @@ function goDownload(): void {
     <div>
       <UPageCard
         title="授权"
-        :description="activation?.profileId ? `发布档：${activation.profileId}` : '当前设备的授权状态'"
+        :description="
+          activation?.profileId ? `发布档：${activation.profileId}` : '当前设备的授权状态'
+        "
         variant="naked"
         orientation="horizontal"
         class="mb-4"
@@ -409,7 +304,9 @@ function goDownload(): void {
         <UFormField label="单位" class="flex items-center justify-between not-last:pb-4 gap-2">
           <span class="text-sm">
             {{ unitName || '—' }}
-            <span v-if="activation?.role" class="text-muted">· {{ roleLabel(activation.role) }}</span>
+            <span v-if="activation?.role" class="text-muted"
+              >· {{ roleLabel(activation.role) }}</span
+            >
           </span>
         </UFormField>
 
@@ -421,58 +318,35 @@ function goDownload(): void {
           <span class="text-sm">{{ formatExpiry(expiresAt) }}</span>
         </UFormField>
 
+
+
         <UFormField
-          v-if="rolledBack"
-          label="系统时间异常"
+          v-if="activation?.licenseId"
+          label="授权 id"
           class="flex items-center justify-between not-last:pb-4 gap-2"
         >
-          <span class="text-sm text-error">检测到时间被回拨，请校正系统时间后重试</span>
+          <span class="text-sm font-mono">{{ activation.licenseId }}</span>
         </UFormField>
 
-        <template v-if="caps?.mode === 'offline'">
-          <UFormField
-            v-if="activation?.licenseId"
-            label="授权 id"
-            class="flex items-center justify-between not-last:pb-4 gap-2"
-          >
-            <span class="text-sm font-mono">{{ activation.licenseId }}</span>
-          </UFormField>
-          <UFormField
-            v-if="activation?.keyId"
-            label="申请密钥"
-            description="学生端加密申请文件所用公钥的编号"
-            class="flex items-center justify-between not-last:pb-4 gap-2"
-          >
-            <span class="text-sm font-mono">{{ activation.keyId }}</span>
-          </UFormField>
-          <UFormField
-            v-if="activation?.fingerprint"
-            label="本机机器码"
-            description="换机 / 签发授权时提供给服务商"
-            class="flex items-center justify-between not-last:pb-4 gap-2"
-          >
-            <div class="flex items-center gap-2 shrink-0">
-              <span class="text-sm font-mono">{{ activation.fingerprint }}</span>
-              <UButton
-                icon="i-lucide-copy"
-                color="neutral"
-                variant="ghost"
-                size="xs"
-                @click="copyFingerprint"
-              />
-            </div>
-          </UFormField>
-          <UFormField
-            v-if="activation?.configVersion"
-            label="配置版本"
-            class="flex items-center justify-between not-last:pb-4 gap-2"
-          >
-            <span class="text-sm">{{ activation.configVersion }}</span>
-          </UFormField>
-        </template>
+        <UFormField
+          v-if="activation?.keyId"
+          label="申请密钥"
+          description="学生端加密申请文件所用公钥的编号"
+          class="flex items-center justify-between not-last:pb-4 gap-2"
+        >
+          <span class="text-sm font-mono">{{ activation.keyId }}</span>
+        </UFormField>
 
         <UFormField
-          v-if="caps?.serverUrlConfigurable && activation?.serverUrl"
+          v-if="activation?.configVersion"
+          label="配置版本"
+          class="flex items-center justify-between not-last:pb-4 gap-2"
+        >
+          <span class="text-sm">{{ activation.configVersion }}</span>
+        </UFormField>
+
+        <UFormField
+          v-if="activation?.serverUrl"
           label="服务端地址"
           class="flex items-center justify-between not-last:pb-4 gap-2"
         >
@@ -480,40 +354,8 @@ function goDownload(): void {
         </UFormField>
 
         <UFormField
-          v-if="caps?.transport === 'file' && activation?.role === 'level1'"
-          label="公钥包"
-          :description="
-            activation?.pubkeyExported
-              ? '已导出；如需重新领取证书可再次导出'
-              : '未导出：小程序拿不到申请公钥，请导出后发给服务商'
-          "
-          class="flex items-center justify-between not-last:pb-4 gap-2"
-        >
-          <UButton
-            label="导出公钥包"
-            color="neutral"
-            variant="outline"
-            :loading="pubkeyBusy"
-            @click="onPublishPubkey"
-          />
-        </UFormField>
-
-        <UFormField
-          v-if="caps?.mode === 'offline'"
-          label="更新授权"
-          description="收到续期授权文件后导入，仅更新有效期与配置"
-          class="flex items-center justify-between not-last:pb-4 gap-2"
-        >
-          <UButton label="更新授权" color="neutral" variant="outline" @click="renewOpen = true" />
-        </UFormField>
-
-        <UFormField
           label="更换授权设备"
-          :description="
-            caps?.transport === 'file'
-              ? '导出换机申请文件发给服务商，收到新授权文件后在新设备激活'
-              : '将本机授权迁移到另一台设备（原授权码作废，签发新码）'
-          "
+          description="将本机授权迁移到另一台设备（原授权码作废并签发新码；新设备用新授权码激活）"
           class="flex items-center justify-between not-last:pb-4 gap-2"
         >
           <UButton
@@ -521,7 +363,7 @@ function goDownload(): void {
             color="neutral"
             variant="outline"
             :loading="rebinding"
-            @click="caps?.transport === 'file' ? (rebindOfflineOpen = true) : (rebindOpen = true)"
+            @click="rebindOpen = true"
           />
         </UFormField>
 
@@ -537,6 +379,7 @@ function goDownload(): void {
             @click="deactivateOpen = true"
           />
         </UFormField>
+
       </UPageCard>
     </div>
   </div>
@@ -576,6 +419,9 @@ function goDownload(): void {
     </div>
   </div>
 
+  <!-- 文件解析：德育分文件解析（学生端导出 + 管理端导出占位） -->
+  <DyfParseView v-else-if="props.tab === 'settings-parse'" />
+
   <!-- 更换授权设备二次确认（受控 open，取消后仍可再次打开） -->
   <UModal
     v-model:open="rebindOpen"
@@ -602,29 +448,6 @@ function goDownload(): void {
     </template>
   </UModal>
 
-  <!-- 离线换机：导出 .dysr（不注销本机） -->
-  <UModal
-    v-model:open="rebindOfflineOpen"
-    title="申请更换设备"
-    description="填写新设备的机器码，导出换机申请文件发给服务商换取新授权文件。本机不会注销。"
-    :ui="{ footer: 'justify-end' }"
-  >
-    <template #body>
-      <div class="flex flex-col gap-4">
-        <UFormField label="新设备机器码" description="在新设备的激活页读取">
-          <UInput v-model="newFingerprint" placeholder="XXXX-XXXX-XXXX" class="w-full" />
-        </UFormField>
-        <UFormField label="原因（可选）">
-          <UInput v-model="rebindReason" placeholder="如：原电脑损坏" class="w-full" />
-        </UFormField>
-      </div>
-    </template>
-    <template #footer>
-      <UButton label="取消" color="neutral" variant="outline" @click="rebindOfflineOpen = false" />
-      <UButton label="导出申请文件" :loading="rebinding" @click="onExportRebind" />
-    </template>
-  </UModal>
-
   <!-- 注销本机账号：二次确认 -->
   <UModal
     v-model:open="deactivateOpen"
@@ -635,48 +458,6 @@ function goDownload(): void {
     <template #footer>
       <UButton label="取消" color="neutral" variant="outline" @click="deactivateOpen = false" />
       <UButton label="注销" color="error" @click="onDeactivate" />
-    </template>
-  </UModal>
-
-  <!-- 更新授权（续期）：导入新授权文件 -->
-  <UModal
-    v-model:open="renewOpen"
-    title="更新授权"
-    description="选择服务商续期后的授权文件（.dysl），输入口令后更新有效期与配置。"
-    :ui="{ footer: 'justify-end' }"
-  >
-    <template #body>
-      <div class="flex flex-col gap-4">
-        <UButton
-          label="选择授权文件"
-          color="neutral"
-          variant="outline"
-          icon="i-lucide-file"
-          @click="onPickRenew"
-        />
-        <div v-if="renewPreview" class="text-sm text-muted">
-          {{ renewPreview.unitName }} · 有效期至 {{ formatExpiry(renewPreview.expiresAt) }}
-        </div>
-        <UFormField v-if="renewPreview" label="口令">
-          <UInput
-            v-model="renewPassword"
-            type="password"
-            placeholder="服务商提供的口令"
-            class="w-full"
-          />
-        </UFormField>
-        <UAlert v-if="renewError" color="error" :title="renewError" variant="soft" />
-      </div>
-    </template>
-    <template #footer>
-      <UButton label="取消" color="neutral" variant="outline" @click="renewOpen = false" />
-      <GuardedButton
-        label="确认更新"
-        :loading="renewBusy"
-        :disabled="!renewPreview"
-        disabled-reason="请先选择并确认新的授权文件"
-        @click="onRenew"
-      />
     </template>
   </UModal>
 </template>

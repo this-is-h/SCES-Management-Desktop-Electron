@@ -6,7 +6,6 @@
  * 两模式共用——在线模式的申请密钥同样本地生成、进本表（决策 #41 修订，见 13 §1）。
  */
 import type { Batch, Jwk } from '@sces/shared'
-import type { DelegatedApplyKey } from '@sces/shared/license'
 import { getDb } from '../db'
 import type { ApplyKeyMaterial } from '../gateway/types'
 
@@ -67,26 +66,6 @@ export function getCurrentApplyKey(): ApplyKeyMaterial {
   const key = getCurrentApplyKeyOrNull()
   if (!key) throw new Error('未找到单位申请密钥，请重新激活或联系服务商')
   return key
-}
-
-/**
- * 全部申请密钥(含私钥 + current 标记),供签发 .dysd 时装入机密段。
- * 下发全部而非仅 current:二三级据此可解密历史轮换密钥加密的旧 .dyf。
- */
-export function listApplyKeysForDelegation(): DelegatedApplyKey[] {
-  const rows = getDb()
-    .prepare(
-      `SELECT key_id AS keyId, public_key_jwk AS publicKeyJwk, private_key_jwk AS privateKeyJwk,
-              is_current AS isCurrent, created_at AS createdAt
-       FROM apply_key ORDER BY is_current DESC, created_at DESC`
-    )
-    .all() as ApplyKeyRow[]
-  return rows.map((r) => ({
-    keyId: r.keyId,
-    current: r.isCurrent === 1,
-    publicKeyJwk: JSON.parse(r.publicKeyJwk) as Jwk,
-    privateKeyJwk: JSON.parse(r.privateKeyJwk) as Jwk
-  }))
 }
 
 /**

@@ -34,34 +34,21 @@ import {
   logoutToVerify,
   hasAnyAccount,
   resumeLastAccount,
-  getFingerprint,
-  inspectLicense,
-  publishPubkey,
-  exportRebindRequest,
-  deactivateCurrent,
-  importUnitCert
+  deactivateCurrent
 } from '../services/unit'
-import {
-  getDelegationReadiness,
-  issueDelegationsBatch,
-  exportDelegationFile,
-  exportDelegationFiles,
-  getDelegationFileName,
-  listDelegations,
-  reissueDelegations,
-  revokeDelegation,
-  revokeDelegations
-} from '../services/delegation'
 import { importApplyFiles } from '../services/import'
-import { exportBatchExchangeToFile, getBatchExchangeFileName, recordBatchExchangeExport } from '../services/exchange'
+import { parseStudentDyfFile } from '../services/dyf-parse'
+import {
+  exportBatchExchangeToFile,
+  getBatchExchangeFileName,
+  recordBatchExchangeExport
+} from '../services/exchange'
 import { currentRole } from '../services/role'
 import { correctName, listConflicts, resolveConflict } from '../services/conflict'
-import { getActiveUnitClassOptions } from '../services/config-template'
 import {
   confirmBatchExport,
   getApplyDetail,
   listApplies,
-  revokeBatchExport,
   setScore,
   fillBaseScores
 } from '../services/apply'
@@ -115,106 +102,10 @@ export function registerIpcHandlers(): void {
     resumeLastAccount()
     reloadAll()
   })
-  ipcMain.handle('unit:get-fingerprint', () => getFingerprint())
-  ipcMain.handle('unit:inspect-license', (_e, filePath: string) => inspectLicense(filePath))
   ipcMain.handle('unit:deactivate', () => {
     deactivateCurrent()
     reloadAll()
   })
-  ipcMain.handle('unit:pick-license', async (e) => {
-    const win = BrowserWindow.fromWebContents(e.sender)
-    const res = await dialog.showOpenDialog(win!, {
-      title: '选择授权文件',
-      properties: ['openFile'],
-      filters: [{ name: '授权文件', extensions: ['dysl', 'dysd'] }]
-    })
-    return res.canceled ? null : (res.filePaths[0] ?? null)
-  })
-  ipcMain.handle('unit:publish-pubkey', async (e) => {
-    const win = BrowserWindow.fromWebContents(e.sender)
-    const res = await dialog.showSaveDialog(win!, {
-      title: '导出单位公钥包（发送给服务商换取单位证书）',
-      defaultPath: '单位公钥包.dysk',
-      filters: [{ name: '单位公钥包', extensions: ['dysk'] }]
-    })
-    if (res.canceled || !res.filePath) return { transport: 'file', exported: false }
-    return publishPubkey(res.filePath)
-  })
-  ipcMain.handle(
-    'unit:export-rebind-request',
-    async (e, newFingerprint: string, reason: string) => {
-      const win = BrowserWindow.fromWebContents(e.sender)
-      const res = await dialog.showSaveDialog(win!, {
-        title: '导出换机申请文件（发送给服务商）',
-        defaultPath: '换机申请.dysr',
-        filters: [{ name: '换机申请文件', extensions: ['dysr'] }]
-      })
-      if (res.canceled || !res.filePath) return null
-      return exportRebindRequest(newFingerprint, reason, res.filePath)
-    }
-  )
-
-  // 单位证书(.dysc)导入(仅 level1;签发下级授权的信任锚)
-  ipcMain.handle('unit:pick-cert', async (e) => {
-    const win = BrowserWindow.fromWebContents(e.sender)
-    const res = await dialog.showOpenDialog(win!, {
-      title: '选择单位证书文件',
-      properties: ['openFile'],
-      filters: [{ name: '单位证书', extensions: ['dysc'] }]
-    })
-    return res.canceled ? null : (res.filePaths[0] ?? null)
-  })
-  ipcMain.handle('unit:import-cert', (_e, filePath: string) => importUnitCert(filePath))
-  ipcMain.handle('unit:get-class-options', () => getActiveUnitClassOptions())
-
-  // M-O1B 下级授权(.dysd)签发与台账(仅 level1;服务层做授权校验)
-  ipcMain.handle('delegation:readiness', () => getDelegationReadiness())
-  ipcMain.handle('delegation:list', () => listDelegations())
-  ipcMain.handle('delegation:issue-batch', async (e, input) => {
-    const win = BrowserWindow.fromWebContents(e.sender)
-    const res = await dialog.showSaveDialog(win!, {
-      title: '导出年级授权包（含对应班级授权）',
-      defaultPath: '下级授权.zip',
-      filters: [{ name: '年级授权包', extensions: ['zip'] }]
-    })
-    if (res.canceled || !res.filePath) return null
-    return issueDelegationsBatch(input, res.filePath)
-  })
-  ipcMain.handle('delegation:reissue', async (e, password: string) => {
-    const win = BrowserWindow.fromWebContents(e.sender)
-    const res = await dialog.showSaveDialog(win!, {
-      title: '导出重签后的年级授权包',
-      defaultPath: '下级授权-重签.zip',
-      filters: [{ name: '年级授权包', extensions: ['zip'] }]
-    })
-    if (res.canceled || !res.filePath) return null
-    return reissueDelegations({ password }, res.filePath)
-  })
-  ipcMain.handle('delegation:revoke', (_e, delegationId: string) => revokeDelegation(delegationId))
-  ipcMain.handle('delegation:export', async (e, delegationId: string) => {
-    const win = BrowserWindow.fromWebContents(e.sender)
-    const defaultPath = getDelegationFileName(delegationId)
-    const res = await dialog.showSaveDialog(win!, {
-      title: '导出下级授权文件',
-      defaultPath,
-      filters: [{ name: '下级授权文件', extensions: ['dysd'] }]
-    })
-    if (res.canceled || !res.filePath) return null
-    return exportDelegationFile(delegationId, res.filePath)
-  })
-  ipcMain.handle('delegation:export-many', async (e, delegationIds: string[]) => {
-    const win = BrowserWindow.fromWebContents(e.sender)
-    const res = await dialog.showSaveDialog(win!, {
-      title: '批量导出下级授权',
-      defaultPath: '选中的下级授权.zip',
-      filters: [{ name: '下级授权压缩包', extensions: ['zip'] }]
-    })
-    if (res.canceled || !res.filePath) return null
-    return exportDelegationFiles(delegationIds, res.filePath)
-  })
-  ipcMain.handle('delegation:revoke-many', (_e, delegationIds: string[]) =>
-    revokeDelegations(delegationIds)
-  )
 
   // 批次（写操作内部已做授权校验）。
   // 密钥最小暴露：渲染层可见的批次一律剥离申请私钥（toPublicBatch），
@@ -260,6 +151,18 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('import:correct-name', (_e, batchId: string, studentId: string, newName: string) =>
     correctName(batchId, studentId, newName)
   )
+
+  // 设置 → 文件解析（.dyf，仅展示不改库）
+  ipcMain.handle('parse:pick-file', async (e) => {
+    const win = BrowserWindow.fromWebContents(e.sender)
+    const res = await dialog.showOpenDialog(win!, {
+      title: '选择德育分文件（.dyf）',
+      properties: ['openFile'],
+      filters: [{ name: '德育分文件', extensions: ['dyf'] }]
+    })
+    return res.canceled ? null : (res.filePaths[0] ?? null)
+  })
+  ipcMain.handle('parse:student-file', (_e, filePath: string) => parseStudentDyfFile(filePath))
 
   // M3 审核（扣分/加分/整班确认导出）与排名
   ipcMain.handle('apply:list', (_e, batchId: string, options) => listApplies(batchId, options))
@@ -321,8 +224,6 @@ export function registerIpcHandlers(): void {
     recordBatchExchangeExport(batch)
     return res.filePath
   })
-  // 撤销整班导出（仅一级，留审计）
-  ipcMain.handle('apply:batch-export-revoke', (_e, batchId: string) => revokeBatchExport(batchId))
   // 决策 #47：手动计算排名（重算 final_grade 与班排/专排，落 ranked_at）
   ipcMain.handle('apply:compute-ranking', (_e, batchId: string) => computeRanking(batchId))
 

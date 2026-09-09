@@ -4,7 +4,6 @@ import type { DropdownMenuItem, NavigationMenuItem } from '@nuxt/ui'
 import type { AccountInfo } from '../../../preload/types'
 import { useToast } from '@nuxt/ui/composables'
 import TitleBar from './TitleBar.vue'
-import LicenseBanner from './LicenseBanner.vue'
 import BatchSelect from './BatchSelect.vue'
 import FileDropOverlay from './FileDropOverlay.vue'
 import ImportResultModal from './ImportResultModal.vue'
@@ -15,7 +14,6 @@ import TableView from '../views/TableView.vue'
 import ReviewView from '../views/ReviewView.vue'
 import AuditView from '../views/AuditView.vue'
 import SettingsView from '../views/SettingsView.vue'
-import DelegationView from '../views/DelegationView.vue'
 import { useFileImport } from '../composables/useFileImport'
 import { ipcErrorMessage } from '../utils/ipc'
 import { fullUnitName } from '../utils/unit-name'
@@ -31,11 +29,11 @@ type Tab =
   | 'dyf-overview'
   | 'dyf-table'
   | 'dyf-review'
-  | 'delegation'
   | 'audit'
   | 'settings-general'
   | 'settings-license'
   | 'settings-accounts'
+  | 'settings-parse'
 
 const current = ref<Tab>('batch')
 const unitName = ref('')
@@ -122,9 +120,11 @@ const importDisabledReason = computed(() => {
 const importResultOpen = ref(false)
 
 // 导入编排（选择/拖放共用；结果写入共享状态，各子页经 refreshTick 刷新）。
+// 拖放仅德育分相关页面启用：设置页（含文件解析）不做拖入（拖入是导入操作，与解析冲突）。
 const { importing, results, dragging, pickAndImport } = useFileImport({
   getBatchId: () => dyfState.batchId,
   getOverwrite: () => role.value === 'level1',
+  enabled: () => !current.value.startsWith('settings'),
   // 一级拖放导入 .dxy 会覆盖同学号旧数据：二次确认后再导入（选择框路径由 onImportClick 确认）。
   confirmOverwrite: () =>
     new Promise<boolean>((resolve) => {
@@ -161,7 +161,11 @@ const confirmState = ref<{
   onCancel?: () => void
 }>({ title: '' })
 const exporting = ref(false)
-const exportProgress = ref<{ completedFrames: number; totalFrames: number; writtenBytes: number } | null>(null)
+const exportProgress = ref<{
+  completedFrames: number
+  totalFrames: number
+  writtenBytes: number
+} | null>(null)
 const exportProgressLabel = computed(() => {
   const progress = exportProgress.value
   if (!progress || progress.totalFrames <= 0) return ''
@@ -317,36 +321,6 @@ function onImportClick(): void {
   } else {
     void pickAndImport()
   }
-}
-
-/** 撤销整班导出（仅一级，留审计）。 */
-async function revokeExport(): Promise<void> {
-  exporting.value = true
-  try {
-    await window.api.apply.revokeBatchExport(dyfState.batchId)
-    toast.add({
-      title: '已撤销导出',
-      description: '全班回到审核中，可继续修改并重新导出',
-      color: 'success'
-    })
-    await loadDyfBatches()
-    bumpDyfRefresh()
-  } catch (err) {
-    toast.add({ title: '操作失败', description: ipcErrorMessage(err), color: 'error' })
-  } finally {
-    exporting.value = false
-  }
-}
-
-function requestRevokeExport(): void {
-  askConfirm({
-    title: '撤销整班导出',
-    description:
-      '撤销后全班回到审核中，可继续修改分数并重新导出（操作留痕，仅一级可操作）。确定撤销吗？',
-    confirmLabel: '撤销',
-    confirmColor: 'error',
-    action: revokeExport
-  })
 }
 
 /** 排名是否为最新（已算且不早于最近一次分数/名单变更）：过期或未算时禁止导出。 */
@@ -538,6 +512,13 @@ const settingsTabItems = computed<NavigationMenuItem[]>(() => [
     value: 'settings-accounts',
     active: current.value === 'settings-accounts',
     onSelect: () => (current.value = 'settings-accounts')
+  },
+  {
+    label: '文件解析',
+    icon: 'i-lucide-file-search',
+    value: 'settings-parse',
+    active: current.value === 'settings-parse',
+    onSelect: () => (current.value = 'settings-parse')
   }
 ])
 
@@ -610,18 +591,6 @@ const navItems = computed<NavigationMenuItem[]>(() => [
     active: current.value === 'audit',
     onSelect: () => (current.value = 'audit')
   },
-  // 下级授权（M-O1B）：仅 level1 可见并可进入
-  ...(role.value === 'level1'
-    ? [
-        {
-          label: '下级授权',
-          icon: 'i-lucide-share-2',
-          value: 'delegation' as Tab,
-          active: current.value === 'delegation',
-          onSelect: () => (current.value = 'delegation')
-        }
-      ]
-    : []),
   {
     label: '设置',
     icon: 'i-lucide-settings',
@@ -780,7 +749,6 @@ const roleMenuItems = computed<DropdownMenuItem[]>(() => {
 <template>
   <div class="flex flex-col h-screen">
     <TitleBar />
-    <LicenseBanner />
     <!-- 覆盖 UDashboardGroup 默认 fixed inset-0（tv/twMerge 需显式 static 才能覆盖 fixed）：
          标题栏占 35px，dashboard 作为 flex item 占据剩余空间。unit=rem + storage=local 对齐模板。 -->
     <UDashboardGroup
@@ -893,9 +861,7 @@ const roleMenuItems = computed<DropdownMenuItem[]>(() => {
         :ui="{
           root: 'min-h-0 h-full',
           body:
-            current === 'delegation' || current === 'dyf-table'
-              ? 'min-h-0 overflow-hidden'
-              : undefined
+            current === 'dyf-table' ? 'min-h-0 overflow-hidden' : undefined
         }"
       >
         <template #header>
@@ -905,9 +871,7 @@ const roleMenuItems = computed<DropdownMenuItem[]>(() => {
                 ? '批次管理'
                 : current.startsWith('dyf-')
                   ? '德育分'
-                  : current === 'delegation'
-                    ? '下级授权'
-                    : current === 'audit'
+                  : current === 'audit'
                       ? '操作记录'
                       : '设置'
             "
@@ -963,15 +927,6 @@ const roleMenuItems = computed<DropdownMenuItem[]>(() => {
                         :disabled="expired"
                         disabled-reason="授权已过期，请到“设置 - 授权信息”更新授权后再导出"
                         @click="reExportData"
-                      />
-                      <GuardedButton
-                        v-if="role === 'level1'"
-                        label="撤销导出"
-                        color="error"
-                        variant="outline"
-                        :disabled="expired"
-                        disabled-reason="授权已过期，请到“设置 - 授权信息”更新授权后再撤销"
-                        @click="requestRevokeExport"
                       />
                     </template>
                     <GuardedButton
@@ -1077,12 +1032,11 @@ const roleMenuItems = computed<DropdownMenuItem[]>(() => {
             description="当前仅可查看历史数据，无法进行操作。请在设置中续期或更换授权设备。"
             class="mb-4"
           />
-          <FileDropOverlay :active="dragging" />
+          <FileDropOverlay :active="dragging && !current.startsWith('settings')" />
           <BatchView v-if="current === 'batch'" :readonly="expired" />
           <OverviewView v-else-if="current === 'dyf-overview'" :readonly="expired" />
           <TableView v-else-if="current === 'dyf-table'" :readonly="expired" />
           <ReviewView v-else-if="current === 'dyf-review'" :readonly="expired" :role="role" />
-          <DelegationView v-else-if="current === 'delegation'" />
           <AuditView v-else-if="current === 'audit'" />
           <SettingsView v-else :tab="currentSettingsTab" />
         </template>
