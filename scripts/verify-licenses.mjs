@@ -122,7 +122,6 @@ function main() {
   const failures = []
   const packages = []
   collect(join(ROOT, 'node_modules', '.pnpm'), packages)
-  collect(join(ROOT, 'user', 'wechat', 'miniprogram', 'node_modules'), packages)
 
   const seen = new Map()
   for (const p of packages) {

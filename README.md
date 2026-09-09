@@ -1,6 +1,6 @@
 # SCES-Management-Desktop-Electron — 管理端（Electron 桌面应用）
 
-学生综合素质测评管理系统（SCES）· 管理端。当前为**离线优先**实现（本地 sqlite 权威、授权文件激活），**在线化进行中**：`src/main/gateway/online.ts` 已具备服务端对接骨架（授权码、HTTP 上报、状态同步），服务端（`../SCES-Server`，M5）建成后逐步接管。
+学生综合素质测评管理系统（SCES）· 管理端。**在线版**：本地 SQLCipher 库为分数/证明材料权威（服务端不存载荷），激活/授权/批次/状态经服务端（`../SCES-Server` / SCES-Server-Vercel）同步；`.dyf` 学生材料仍以加密文件导入（数据面文件交付）。离线授权链（授权文件、机器码、委派）已移除。
 
 ## 仓库关系
 
@@ -28,5 +28,3 @@ pnpm gen:update-manifest  # 生成 dist-update/latest.json
 - 提交规范 / 分支模型 / CI 门禁见 `CONTRIBUTING.md`；
 - 发布档一律改 `deploy/profile.json`（单一真源），构建期注入；
 - 服务端契约改动先改 `SCES-Server`/contracts`，再 `pnpm sync:seed-templates` 同步种子。
-
-> 离线授权链路（授权文件、签发、机器码）随产品转向在线版将逐步退役，模块级下线由 M5 在线化重构按"每提交一模块"推进，不在此次仓库拆分中删代码。
