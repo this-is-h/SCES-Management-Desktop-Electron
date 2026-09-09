@@ -3,10 +3,14 @@
  * - 拖入文件（dataTransfer.types 含 Files）时置 dragging=true，页面显示遮罩；
  * - 用进入/离开计数器避免子元素间的 dragleave 误关；
  * - 松开（drop）回调 onFiles(File[])，由调用方转为本地路径后导入。
+ * - enabled：页面级开关（如设置页禁用拖放，避免与「选择文件」上传语义冲突）。
  */
 import { onMounted, onUnmounted, ref } from 'vue'
 
-export function useFileDrop(onFiles: (files: File[]) => void): { dragging: import('vue').Ref<boolean> } {
+export function useFileDrop(
+  onFiles: (files: File[]) => void,
+  enabled: () => boolean = () => true
+): { dragging: import('vue').Ref<boolean> } {
   const dragging = ref(false)
   let depth = 0
 
@@ -15,20 +19,20 @@ export function useFileDrop(onFiles: (files: File[]) => void): { dragging: impor
   }
 
   function onDragEnter(e: DragEvent): void {
-    if (!hasFiles(e)) return
+    if (!enabled() || !hasFiles(e)) return
     e.preventDefault()
     depth += 1
     dragging.value = true
   }
 
   function onDragOver(e: DragEvent): void {
-    if (!hasFiles(e)) return
+    if (!enabled() || !hasFiles(e)) return
     // 阻止浏览器默认“打开文件”行为，允许 drop
     e.preventDefault()
   }
 
   function onDragLeave(e: DragEvent): void {
-    if (!hasFiles(e)) return
+    if (!enabled() || !hasFiles(e)) return
     depth = Math.max(0, depth - 1)
     if (depth === 0) dragging.value = false
   }
@@ -38,6 +42,7 @@ export function useFileDrop(onFiles: (files: File[]) => void): { dragging: impor
     if (hasFiles(e)) e.preventDefault()
     depth = 0
     dragging.value = false
+    if (!enabled()) return
     if (files && files.length) {
       onFiles(Array.from(files))
     }
