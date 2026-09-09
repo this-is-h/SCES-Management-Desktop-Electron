@@ -1,12 +1,13 @@
 /**
  * 批次服务：一次综测周期的完整配置，由一级管理端创建（架构文档 §3.1）。
- * 批次密钥取单位申请密钥（跨批次复用，gateway.resolveApplyKey）；batchId 两模式确定性派生
- * （与学生端包内一致，决策 #46）。状态机 draft → active → closed。
+ * 批次密钥取单位申请密钥（跨批次复用，gateway.resolveApplyKey）；batchId 为服务端可登记的
+ * UUID v4（在线模式由服务端核验/登记，不再与学生端做确定性派生）。状态机 draft → active → closed。
  * 计算规则（calcMode/calcConfig）与排名范围（rankScope）从单位绑定配置模板读取，
  * 创建时快照到批次，模板后续更新不影响已创建批次。
  */
+import { randomUUID } from 'crypto'
 import type { Batch, BatchStatus, CalcConfig, RankScope } from '@sces/shared'
-import { assertBatchTransition, BATCH_STATUS_LABELS, deriveOfflineBatchId } from '@sces/shared'
+import { assertBatchTransition, BATCH_STATUS_LABELS } from '@sces/shared'
 import { getDb } from '../db'
 import { gateway } from '../gateway'
 import { publishBatchReliable, publishBatchStatusReliable } from './status-outbox'
@@ -149,14 +150,6 @@ function requireUnitId(): string {
   return row.id
 }
 
-/** 同 (year, semester, isTest) 下的下一个序号（1 + 已有批次数，决策 #46）。 */
-function nextBatchSeq(year: number, semester: 1 | 2, isTest: boolean): number {
-  const row = getDb()
-    .prepare('SELECT COUNT(*) AS n FROM batch WHERE year = ? AND semester = ? AND is_test = ?')
-    .get(year, semester, isTest ? 1 : 0) as { n: number }
-  return row.n + 1
-}
-
 /** 批次列表（按创建时间倒序）。 */
 export function listBatches(): Batch[] {
   const db = getDb()
@@ -214,16 +207,9 @@ export async function createBatch(
   // 密钥：两模式统一取单位申请密钥（跨批次复用；离线来自授权后本地生成，在线同）。
   const applyKey = await gateway.resolveApplyKey()
 
-  // 批次 id：两模式确定性派生（与学生端包内一致，决策 #46 修订）。
+  // 批次 id：UUID v4（在线模式服务端按 batchId 登记/下发；不再做客户端确定性派生）。
   const unitId = requireUnitId()
-  const seq = nextBatchSeq(input.year, input.semester, isTest)
-  const id = await deriveOfflineBatchId({
-    unitId,
-    year: input.year,
-    semester: input.semester,
-    isTest,
-    seq
-  })
+  const id = randomUUID()
 
   const now = Date.now()
   db.prepare(
