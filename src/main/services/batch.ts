@@ -247,8 +247,7 @@ export async function createBatch(
       isTest,
       calcMode,
       templateId: configTemplateId,
-      keyId: applyKey.keyId,
-      seq
+      keyId: applyKey.keyId
     }
   })
 
