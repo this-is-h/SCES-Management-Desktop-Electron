@@ -48,7 +48,8 @@ const PLAIN_LICENSES = new Set([
   '(MIT OR CC0-1.0)',
   'Python-2.0',
   'MPL-2.0',
-  'CC-BY-4.0'
+  'CC-BY-4.0',
+  '(MIT OR Apache-2.0)'
 ])
 
 /**
@@ -73,7 +74,9 @@ const NOTICE_REQUIRED = new Map([
  */
 const UNLICENSED_EXEMPT = new Map([
   ['buffers@0.1.1', 'dev-only 传递依赖，上游未声明许可；不进分发产物'],
-  ['vaul-vue@0.4.1', 'dev-only 构建依赖（@nuxt/ui 传递），上游仓库声明 MIT 但 npm 包清单缺失 license 字段；不进分发产物']
+  ['vaul-vue@0.4.1', 'dev-only 构建依赖（@nuxt/ui 传递），上游仓库声明 MIT 但 npm 包清单缺失 license 字段；不进分发产物'],
+  ['@sces/shared@0.2.0', '本项目自有共享层（git 依赖，UNLICENSED/private），源码打包进应用'],
+  ['@sces/contracts@0.1.0', '本项目自有契约包（file/git 依赖，清单未声明许可），仅构建期同步种子用，不进分发产物']
 ])
 
 /** 不参与审计的目录：元目录。 */
@@ -140,7 +143,7 @@ function main() {
       }
       continue
     }
-    if (p.license === '(none)' && UNLICENSED_EXEMPT.has(key)) continue
+    if ((p.license === '(none)' || p.license === 'UNLICENSED') && UNLICENSED_EXEMPT.has(key)) continue
     failures.push(`依赖 ${key} 许可「${p.license}」不在白名单：请在 scripts/verify-licenses.mjs 显式处置（新增白名单 / 通知标记 / 豁免说明）`)
   }
 
