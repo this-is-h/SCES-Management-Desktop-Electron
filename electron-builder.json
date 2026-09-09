@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "appId": "cn.thisish.dms",
+  "appId": "cn.thisish.sces",
   "productName": "学生综合素质测评管理系统",
   "directories": {
     "buildResources": "build"
@@ -22,9 +22,7 @@
     "!tsconfig.node.json",
     "!tsconfig.web.json"
   ],
-  "asarUnpack": [
-    "resources/**"
-  ],
+  "asarUnpack": ["resources/**"],
   "extraResources": [
     {
       "from": "THIRD_PARTY_NOTICES.md",
@@ -66,11 +64,7 @@
     "artifactName": "${name}-${version}.${ext}"
   },
   "linux": {
-    "target": [
-      "AppImage",
-      "snap",
-      "deb"
-    ],
+    "target": ["AppImage", "snap", "deb"],
     "maintainer": "electronjs.org",
     "category": "Utility"
   },

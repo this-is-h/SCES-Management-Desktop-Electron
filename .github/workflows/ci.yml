@@ -47,8 +47,8 @@ jobs:
         # 契约种子源：SCES-Server 仓库 contracts/seed（sync-seed-templates SRC 多候选，
         # 无本地 sibling 时读 SCES_CONTRACTS_SEED）
         run: |
-          git clone --depth 1 --branch v0.1.0 "https://github.com/this-is-h/SCES-Server.git" sces-server-checkout
-          echo "SCES_CONTRACTS_SEED=${GITHUB_WORKSPACE}/sces-server-checkout/contracts/seed" >> "$GITHUB_ENV"
+          git clone --depth 1 --branch v0.1.0 "https://github.com/this-is-h/SCES-Server.git" server-checkout
+          echo "SCES_CONTRACTS_SEED=${GITHUB_WORKSPACE}/server-checkout/contracts/seed" >> "$GITHUB_ENV"
       - run: pnpm install --frozen-lockfile
       - name: 编译门禁
         run: pnpm build

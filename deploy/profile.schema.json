@@ -79,7 +79,7 @@
               "configId": {
                 "type": "string",
                 "minLength": 1,
-                "description": "对应 server/contracts/seed/<configId>.json"
+                "description": "对应 SCES-Server/contracts/seed/<configId>.json"
               },
               "keyId": {
                 "type": "string",
@@ -95,8 +95,14 @@
                   "semester": { "type": "integer", "enum": [1, 2] },
                   "isTest": { "type": "boolean" },
                   "seq": { "type": "integer", "minimum": 1 },
-                  "applyStartAt": { "type": ["integer", "null"], "description": "申请窗口，epoch 毫秒；null 表示未设" },
-                  "applyEndAt": { "type": ["integer", "null"], "description": "申请窗口，epoch 毫秒；null 表示未设" }
+                  "applyStartAt": {
+                    "type": ["integer", "null"],
+                    "description": "申请窗口，epoch 毫秒；null 表示未设"
+                  },
+                  "applyEndAt": {
+                    "type": ["integer", "null"],
+                    "description": "申请窗口，epoch 毫秒；null 表示未设"
+                  }
                 }
               }
             }

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * 受控同步脚本：将契约种子（server/contracts/seed）拷贝到管理端资源目录
- * （management/desktop/resources/templates），落地决策 #38——
+ * 受控同步脚本：将契约种子（SCES-Server/contracts/seed）拷贝到管理端资源目录
+ * （resources/templates），落地决策 #38——
  * 契约种子为单位配置**唯一权威**，管理端不再内置独立格式的模板，只镜像契约产物。
  *
  * 背景：管理端启动时 seedTemplates() 从 resources/templates/ 读内置配置种子填充
@@ -46,11 +46,11 @@ function normalize(text) {
 
 async function main() {
   if (!existsSync(SRC)) {
-    throw new Error(`契约种子目录不存在：${SRC}，请确认 server/contracts 已初始化`)
+    throw new Error(`契约种子目录不存在：${SRC}，请确认 SCES-Server/contracts 已初始化`)
   }
   for (const file of SYNC_FILES) {
     if (!existsSync(path.join(SRC, file))) {
-      throw new Error(`契约种子缺失：${file}（应由 server/contracts build:seeds 生成）`)
+      throw new Error(`契约种子缺失：${file}（应由 SCES-Server/contracts build:seeds 生成）`)
     }
   }
 

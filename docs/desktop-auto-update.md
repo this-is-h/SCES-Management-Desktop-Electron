@@ -24,7 +24,7 @@
 
    `https://github.com/this-is-h/SCES-Management-Desktop-Electron`（当前已是）。
 
-3. **版本号**：`management/desktop/package.json` 的 `version`（当前 `0.1.0`）与 git tag 保持一致（CI 生成 latest.json 时读取它）。
+3. **版本号**：仓库根 `package.json` 的 `version`（当前 `0.1.0`）与 git tag 保持一致（CI 生成 latest.json 时读取它）。
 
 ## 本地生成元数据（不改仓库也能预览）
 

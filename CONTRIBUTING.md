@@ -49,10 +49,10 @@
 
 1. `develop` 成熟 → 合并 `main` 并打 `vX.Y.Z` tag；
 2. `release.yml`（tag 触发，Windows runner）：`pnpm build` → electron-builder 出安装包（`DMS_PROFILE_ID` 取自 `deploy/profile.json`）→ 生成 `dist-update/latest.json` → **跨仓推送**到 `this-is-h/SCES-Web-Vercel` 的 `public/updates/latest.json`（触发 Vercel 自动部署）→ 上传安装包到 GitHub Release；
-3. 跨仓推送与私有依赖拉取需要仓库级 Actions secret `SCES_CI_TOKEN`（fine-grained PAT：SCES-Web-Vercel `Contents:write` + SCES-Shared/sces-server `Contents:read`）。
+3. 跨仓推送与私有依赖拉取需要仓库级 Actions secret `SCES_CI_TOKEN`（fine-grained PAT：SCES-Server `Contents:write`(latest.json 推送) + SCES-Shared/SCES-Server `Contents:read`(git 依赖/种子)）。
 
 ## 关键文件
 
 - `deploy/profile.json`：发布档单一真源（服务端 API 地址、logo 档标识、更新源），构建期由 electron.vite 注入；
 - `scripts/build-profile.mjs`：发布档 schema + 模式一致性校验（构建前置门禁）；
-- `scripts/sync-seed-templates.mjs`：从 `@sces/contracts` 包镜像契约种子到 `resources/templates`（逐字节一致，`--check` 供 CI）。
+- `scripts/sync-seed-templates.mjs`：从 SCES-Server 契约种子（`../SCES-Server/contracts/seed` 或 env `SCES_CONTRACTS_SEED`）镜像到 `resources/templates`（逐字节一致，`--check` 供 CI）。

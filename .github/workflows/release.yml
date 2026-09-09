@@ -31,8 +31,8 @@ jobs:
       - name: 拉取契约种子（SCES-Server）
         # 契约种子源：SCES-Server 仓库 contracts/seed（sync-seed-templates SRC 多候选）
         run: |
-          git clone --depth 1 --branch v0.1.0 "https://github.com/this-is-h/SCES-Server.git" sces-server-checkout
-          echo "SCES_CONTRACTS_SEED=${GITHUB_WORKSPACE}/sces-server-checkout/contracts/seed" >> "$GITHUB_ENV"
+          git clone --depth 1 --branch v0.1.0 "https://github.com/this-is-h/SCES-Server.git" server-checkout
+          echo "SCES_CONTRACTS_SEED=${GITHUB_WORKSPACE}/server-checkout/contracts/seed" >> "$GITHUB_ENV"
 
       - name: 安装 pnpm
         uses: pnpm/action-setup@v4
@@ -67,9 +67,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git clone --depth 1 "https://x-access-token:${SCES_CI_TOKEN}@github.com/this-is-h/SCES-Server.git" sces-server-updates
-          cp dist-update/latest.json sces-server-updates/updates/latest.json
-          cd sces-server-updates
+          git clone --depth 1 "https://x-access-token:${SCES_CI_TOKEN}@github.com/this-is-h/SCES-Server.git" server-updates
+          cp dist-update/latest.json server-updates/updates/latest.json
+          cd server-updates
           git add updates/latest.json
           if git diff --cached --quiet; then
             echo "latest.json 无变更，跳过推送"
