@@ -160,10 +160,7 @@ export async function parseStudentDyfFile(filePath: string): Promise<DyfParseStu
     return {
       fileName,
       ok: false,
-      error:
-        header.documentType === 'admin-exchange'
-          ? '这是管理端导出的数据交换文件，请在「管理端导出」页解析'
-          : '仅支持德育分 v2 学生申请文件'
+      error: '仅支持德育分 v2 学生申请文件（.dyf）'
     }
   }
 

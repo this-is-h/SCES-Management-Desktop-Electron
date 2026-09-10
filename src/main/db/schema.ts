@@ -314,7 +314,7 @@ export const MIGRATIONS: string[] = [
   );
   CREATE INDEX idx_status_outbox_pending ON status_outbox(completed_at, next_attempt_at);
   `,
-  // v12：记录最近一次成功保存公示表格的时间，用于 .dxy 导出前的一致性门禁。
+  // v12：记录最近一次成功保存公示表格的时间（.dxy 数据交换下线后该列仅留作审计/兼容）。
   `
   ALTER TABLE batch ADD COLUMN table_exported_at INTEGER;
   `,

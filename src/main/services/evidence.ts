@@ -5,7 +5,6 @@
  * 读取时按当前账号目录解析——数据目录迁移（settings.dataDir）后路径依然有效。
  */
 import { mkdirSync, writeFileSync, readFileSync, existsSync, renameSync, rmSync, statSync } from 'fs'
-import { stat as statAsync, readFile as readFileAsync } from 'fs/promises'
 import { dirname, join, sep } from 'path'
 import { randomUUID } from 'crypto'
 import { createHash } from 'crypto'
@@ -288,7 +287,7 @@ export function resolveEvidencePath(relPath: string): string {
 }
 
 /**
- * 读证据文件为原始 base64（.dxy 交换嵌入用，与 .dyf payload 的证据格式一致）。
+ * 读证据文件为原始 base64（审核展示与另存用）。
  * 文件不存在或非文件返回 null。
  */
 export function readEvidenceFileBase64(relPath: string): string | null {
@@ -298,21 +297,6 @@ export function readEvidenceFileBase64(relPath: string): string | null {
   if (!stat.isFile()) return null
   return readFileSync(filePath).toString('base64')
 }
-
-/**
- * 异步读证据文件为原始 base64（.dxy 整包导出用，避免大批量证据同步读阻塞主进程）。
- * 文件不存在或非文件返回 null。
- */
-export async function readEvidenceFileBase64Async(relPath: string): Promise<string | null> {
-  const filePath = resolveEvidencePath(relPath)
-  try {
-    const st = await statAsync(filePath)
-    if (!st.isFile()) return null
-    return (await readFileAsync(filePath)).toString('base64')
-  } catch {
-    return null
-  }
- }
 
 /** 读证据文件为 data URL（审核详情展示用）。文件不存在返回 null。 */
 export function readEvidenceAsDataUrl(relPath: string): string | null {
@@ -332,21 +316,9 @@ export function readEvidenceAsDataUrl(relPath: string): string | null {
   return `data:${mime};base64,${base64}`
 }
 
-/** Reads an evidence object without the 4/3 base64 expansion used by legacy callers. */
-export async function readEvidenceFileBytesAsync(relPath: string): Promise<Buffer | null> {
-  const filePath = resolveEvidencePath(relPath)
-  try {
-    const st = await statAsync(filePath)
-    if (!st.isFile()) return null
-    return await readFileAsync(filePath)
-  } catch {
-    return null
-  }
-}
-
 /**
  * 从证据文件相对路径收集其所属证据目录（去重、仅接受 evidence/ 前缀）。
- * 用于覆盖导入/冲突处理后清理旧证据孤儿目录。
+ * 用于冲突处理后清理旧证据孤儿目录。
  */
 export function collectEvidenceDirs(relPaths: string[]): string[] {
   const dirs: string[] = []

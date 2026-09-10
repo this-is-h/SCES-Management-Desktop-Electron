@@ -90,7 +90,7 @@ const dyfTabItems = computed<NavigationMenuItem[]>(() => [
   }
 ])
 
-// ---------- 德育分功能区（决策 #19）：批次选择 / 导入 / 导出整班 / 导出表格 ----------
+// ---------- 德育分功能区（决策 #19）：批次选择 / 导入 / 最终确认 / 导出表格 ----------
 // 批次选择与导入/导出集中在标题栏右侧功能区；总览页只显示批次选择。
 
 /** 是否已完成班级端审核（整班导出，决策 #17，响应式）。 */
@@ -110,7 +110,7 @@ const importDisabledReason = computed(() => {
   const batch = currentBatch.value
   if (!batch) return '请先选择一个批次'
   if (expired.value) return '授权已过期，请到“设置 - 授权信息”更新授权'
-  if (exported.value) return '该批次已导出锁定；一级离线端可先撤销导出，其他角色不能再修改'
+  if (exported.value) return '该批次已整班确认锁定，不能再导入'
   if (batch.status === 'draft') return '批次尚未开放，请先到“批次管理”激活批次'
   if (batch.status === 'closed') return '批次已经结束，不能再导入或补录数据'
   return '当前批次暂不可执行此操作'
@@ -123,21 +123,7 @@ const importResultOpen = ref(false)
 // 拖放仅德育分相关页面启用：设置页（含文件解析）不做拖入（拖入是导入操作，与解析冲突）。
 const { importing, results, dragging, pickAndImport } = useFileImport({
   getBatchId: () => dyfState.batchId,
-  getOverwrite: () => role.value === 'level1',
   enabled: () => !current.value.startsWith('settings'),
-  // 一级拖放导入 .dxy 会覆盖同学号旧数据：二次确认后再导入（选择框路径由 onImportClick 确认）。
-  confirmOverwrite: () =>
-    new Promise<boolean>((resolve) => {
-      askConfirm({
-        title: '导入将覆盖同学号旧数据',
-        description:
-          '一级拖入管理端交换文件（.dyf）会用新数据覆盖相同学号的已有申请与分数（不可恢复）。确定继续导入吗？',
-        confirmLabel: '继续导入',
-        confirmColor: 'error',
-        action: async () => resolve(true),
-        onCancel: () => resolve(false)
-      })
-    }),
   onImported: () => {
     dyfState.results = results.value
     importResultOpen.value = results.value.length > 0
@@ -161,16 +147,6 @@ const confirmState = ref<{
   onCancel?: () => void
 }>({ title: '' })
 const exporting = ref(false)
-const exportProgress = ref<{
-  completedFrames: number
-  totalFrames: number
-  writtenBytes: number
-} | null>(null)
-const exportProgressLabel = computed(() => {
-  const progress = exportProgress.value
-  if (!progress || progress.totalFrames <= 0) return ''
-  return `导出中 ${Math.floor((progress.completedFrames / progress.totalFrames) * 100)}%`
-})
 
 function askConfirm(opts: {
   title: string
@@ -207,120 +183,9 @@ async function loadDyfBatches(): Promise<void> {
   }
 }
 
-/** 整班确认并导出（issue #4/#5）：二三级确认 + 产出 .dyf 数据文件（取消保存则不锁定，可重试）；一级为汇总终端仅最终确认。 */
-async function exportWholeClass(): Promise<void> {
-  if (expired.value) {
-    toast.add({ title: '授权已过期', description: '请先在设置中续期或更新授权', color: 'warning' })
-    return
-  }
-  if (!rankingFresh.value) {
-    toast.add({
-      title: '请先计算排名',
-      description: '分数有更新，导出前请到「总体情况」页点「计算排名」确认最新排名',
-      color: 'warning'
-    })
-    return
-  }
-  if (role.value !== 'level1' && !tableExportFresh.value) {
-    toast.add({
-      title: '请先导出最新表格',
-      description: '德育分数据文件必须与公示表格一致；请先点击“导出表格”，再执行本级数据导出',
-      color: 'warning'
-    })
-    return
-  }
-  exportProgress.value = null
-  exporting.value = true
-  try {
-    const r = await window.api.apply.confirmBatchExport(dyfState.batchId)
-    if (r.canceled) return // 取消保存文件：未确认、未锁定，可重试（不锁死数据）
-    toast.add({
-      title:
-        role.value === 'level1'
-          ? '已最终确认'
-          : role.value === 'level2'
-            ? '已导出本级数据'
-            : '已确认并导出',
-      description:
-        role.value === 'level2' && r.path
-          ? `数据文件已导出到：${r.path}；年级端仍可继续复核和再次导出`
-          : r.path
-            ? `全班 ${r.confirmedCount} 人已确认，数据文件已导出到：${r.path}`
-            : `全班 ${r.confirmedCount ?? 0} 人已最终确认`,
-      color: r.syncPending ? 'warning' : 'success'
-    })
-    if (r.syncPending) {
-      toast.add({
-        title: '在线状态待同步',
-        description: '本地已完成确认，服务端状态尚未同步，请联网后重试',
-        color: 'warning'
-      })
-    }
-    await loadDyfBatches()
-    bumpDyfRefresh()
-  } catch (err) {
-    toast.add({ title: '操作失败', description: ipcErrorMessage(err), color: 'error' })
-  } finally {
-    exporting.value = false
-    exportProgress.value = null
-  }
-}
-
-function requestWholeClassExport(): void {
-  if (!canExportWholeClass.value) {
-    void exportWholeClass()
-    return
-  }
-  askConfirm({
-    title:
-      role.value === 'level1'
-        ? '最终确认全部数据'
-        : role.value === 'level2'
-          ? '导出本级数据'
-          : '确认并导出整班数据',
-    description:
-      role.value === 'level1'
-        ? '将一次性最终确认全部已导入数据并固定排名；操作后本端锁定、影响重大，请确认无误后继续。'
-        : role.value === 'level2'
-          ? '将按最新排名和已导出的公示表格生成本级数据文件；导出后仍可继续复核、修改并再次导出。'
-          : '将一次性确认全部数据并导出为数据文件（.dyf，发送给上级管理员复核）；导出后本端锁定，不可再修改本批次。',
-    confirmLabel: role.value === 'level1' ? '最终确认' : '确认并导出',
-    confirmColor: 'error',
-    action: exportWholeClass
-  })
-}
-
-/** 重新导出数据文件（issue #5：二级可无限制导出）：已锁定批次重新生成 .dyf，不改任何状态。 */
-async function reExportData(): Promise<void> {
-  exportProgress.value = null
-  exporting.value = true
-  try {
-    const path = await window.api.export.batchData(dyfState.batchId)
-    if (path) toast.add({ title: '已重新导出数据', description: path, color: 'success' })
-  } catch (err) {
-    toast.add({ title: '导出失败', description: ipcErrorMessage(err), color: 'error' })
-  } finally {
-    exporting.value = false
-    exportProgress.value = null
-  }
-}
-
-/** 导入按钮：一级导入前强提示会覆盖同学号旧数据（issue #5）；二三级直接选择导入（不覆盖）。 */
+/** 导入按钮：选择/拖放 .dyf 学生申请文件。 */
 function onImportClick(): void {
-  if (role.value === 'level1') {
-    askConfirm({
-      title: '导入将覆盖同学号旧数据',
-      description:
-        '一级导入管理端交换文件（.dyf）会用新数据覆盖相同学号的已有申请与分数（不可恢复）。确定继续导入吗？',
-      confirmLabel: '继续导入',
-      confirmColor: 'error',
-      action: async () => {
-        await pickAndImport()
-      }
-    })
-  } else {
-    void pickAndImport()
-  }
+  void pickAndImport()
 }
 
 /** 排名是否为最新（已算且不早于最近一次分数/名单变更）：过期或未算时禁止导出。 */
@@ -330,22 +195,13 @@ const rankingFresh = computed(() => {
   return !b.scoresChangedAt || b.rankedAt >= b.scoresChangedAt
 })
 
-/** 非一级导出 .dxy 前，公示表格必须晚于最近一次分数/名单变更。 */
-const tableExportFresh = computed(() => {
-  const b = currentBatch.value
-  if (!b?.tableExportedAt) return false
-  return !b.scoresChangedAt || b.tableExportedAt >= b.scoresChangedAt
-})
-
 /** 可计算排名：进行中批次、未整班导出、未过期。 */
 const canComputeRanking = computed(
   () => currentBatch.value?.status === 'active' && !exported.value && !expired.value
 )
 
-/** 可整班导出：未过期且排名最新（未算/过期时禁止，须先「计算排名」）。 */
-const canExportWholeClass = computed(
-  () => !expired.value && rankingFresh.value && (role.value === 'level1' || tableExportFresh.value)
-)
+/** 可整班最终确认：未过期且排名最新（未算/过期时禁止，须先「计算排名」）。 */
+const canExportWholeClass = computed(() => !expired.value && rankingFresh.value)
 
 /** 可导出表格：未过期，且排名最新或已锁定（已导出批次排名已冻结，可随时导公示表）。 */
 const canExportTable = computed(() => !expired.value && (exported.value || rankingFresh.value))
@@ -363,10 +219,7 @@ const wholeClassDisabledReason = computed(() => {
   if (!currentBatch.value) return '请先选择一个批次'
   if (expired.value) return '授权已过期，请到“设置 - 授权信息”更新授权'
   if (!rankingFresh.value) return '分数或名单有更新，请先点击“计算排名”'
-  if (role.value !== 'level1' && !tableExportFresh.value) {
-    return '请先导出与当前数据一致的最新公示表格'
-  }
-  return '当前状态不能导出本级数据'
+  return '当前状态不能执行最终确认'
 })
 
 const tableDisabledReason = computed(() => {
@@ -402,6 +255,59 @@ async function computeRankingNow(): Promise<void> {
 }
 
 /** 导出表格（.xlsx）：主进程按当前类别/班级/搜索筛选生成（决策 #19）。排名过期时禁止。 */
+/** 整班最终确认：一次性确认全部已导入数据并固定排名（确认即锁定，状态经 outbox 同步服务端）。 */
+async function exportWholeClass(): Promise<void> {
+  if (expired.value) {
+    toast.add({ title: '授权已过期', description: '请先在设置中续期或更新授权', color: 'warning' })
+    return
+  }
+  if (!rankingFresh.value) {
+    toast.add({
+      title: '请先计算排名',
+      description: '分数有更新，导出前请到「总体情况」页点「计算排名」确认最新排名',
+      color: 'warning'
+    })
+    return
+  }
+  exporting.value = true
+  try {
+    const r = await window.api.apply.confirmBatchExport(dyfState.batchId)
+    toast.add({
+      title: '已最终确认',
+      description: `全班 ${r.confirmedCount ?? 0} 人已确认`,
+      color: r.syncPending ? 'warning' : 'success'
+    })
+    if (r.syncPending) {
+      toast.add({
+        title: '在线状态待同步',
+        description: '本地已完成确认，服务端状态尚未同步，请联网后重试',
+        color: 'warning'
+      })
+    }
+    await loadDyfBatches()
+    bumpDyfRefresh()
+  } catch (err) {
+    toast.add({ title: '操作失败', description: ipcErrorMessage(err), color: 'error' })
+  } finally {
+    exporting.value = false
+  }
+}
+
+function requestWholeClassExport(): void {
+  if (!canExportWholeClass.value) {
+    void exportWholeClass()
+    return
+  }
+  askConfirm({
+    title: '最终确认全部数据',
+    description:
+      '将一次性最终确认全部已导入数据并固定排名；操作后本端锁定、影响重大，请确认无误后继续。',
+    confirmLabel: '最终确认',
+    confirmColor: 'error',
+    action: exportWholeClass
+  })
+}
+
 async function exportTableXlsx(): Promise<void> {
   if (expired.value) {
     toast.add({ title: '授权已过期', description: '请先在设置中续期或更新授权', color: 'warning' })
@@ -523,9 +429,7 @@ const settingsTabItems = computed<NavigationMenuItem[]>(() => [
 ])
 
 onMounted(async () => {
-  window.api.export.onBatchProgress((progress) => {
-    exportProgress.value = progress
-  })
+
   try {
     const info = await window.api.unit.get()
     if (info) unitName.value = fullUnitName(info)
@@ -905,39 +809,15 @@ const roleMenuItems = computed<DropdownMenuItem[]>(() => {
                       @click="onImportClick"
                     />
                     <UBadge
-                      v-if="exporting && exportProgressLabel"
-                      color="primary"
+                      v-if="exported"
+                      color="success"
                       variant="subtle"
-                      icon="i-lucide-loader-circle"
-                      :label="exportProgressLabel"
+                      icon="i-lucide-lock"
+                      label="已导出"
                     />
-                    <template v-if="exported">
-                      <UBadge
-                        color="success"
-                        variant="subtle"
-                        icon="i-lucide-lock"
-                        label="已导出"
-                      />
-                      <GuardedButton
-                        v-if="role !== 'level1'"
-                        label="重新导出数据"
-                        icon="i-lucide-file-down"
-                        variant="outline"
-                        :loading="exporting"
-                        :disabled="expired"
-                        disabled-reason="授权已过期，请到“设置 - 授权信息”更新授权后再导出"
-                        @click="reExportData"
-                      />
-                    </template>
                     <GuardedButton
                       v-else
-                      :label="
-                        role === 'level1'
-                          ? '最终确认'
-                          : role === 'level2'
-                            ? '导出本级数据'
-                            : '导出整班'
-                      "
+                      label="最终确认"
                       icon="i-lucide-package-check"
                       :loading="exporting"
                       :disabled="!canExportWholeClass"

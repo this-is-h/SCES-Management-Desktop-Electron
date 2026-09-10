@@ -12,10 +12,6 @@ import type { ImportFileResult } from '../../../preload/types'
 export function useFileImport(opts: {
   /** 取当前批次 id（拖放/选择时校验）。 */
   getBatchId: () => string
-  /** 是否以覆盖方式导入（仅一级导入 .dxy 生效；渲染层据角色返回）。 */
-  getOverwrite?: () => boolean
-  /** 覆盖导入前的二次确认（仅一级 .dxy 拖放生效）。返回 false 则中止导入。 */
-  confirmOverwrite?: () => Promise<boolean> | boolean
   /** 拖放是否启用（设置页等禁止拖入时传 false 判定）。 */
   enabled?: () => boolean
   /** 导入完成后回调（刷新列表/冲突/大表格）。 */
@@ -40,9 +36,7 @@ export function useFileImport(opts: {
     }
     importing.value = true
     try {
-      results.value = await window.api.import.run(batchId, paths, {
-        overwrite: opts.getOverwrite?.() ?? false
-      })
+      results.value = await window.api.import.run(batchId, paths)
       const ok = results.value.filter((r) => r.ok && r.decision === 'accept').length
       const reject = results.value.filter((r) => r.decision === 'reject').length
       const conflict = results.value.filter((r) => r.decision === 'conflict').length
@@ -74,11 +68,6 @@ export function useFileImport(opts: {
     if (!paths.length) {
       toast.add({ title: '未获取到文件路径', color: 'warning' })
       return
-    }
-    // 一级拖放导入 .dxy 会覆盖同学号旧数据：先弹二次确认（选择框路径已在 onImportClick 确认，此处仅兜底拖放）。
-    if (opts.getOverwrite?.() && opts.confirmOverwrite) {
-      const proceed = await opts.confirmOverwrite()
-      if (!proceed) return
     }
     await runPaths(paths)
   }
