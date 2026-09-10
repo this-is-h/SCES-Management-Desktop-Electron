@@ -65,7 +65,7 @@ function buildExportPlan(batchId: string, options: ExportTableOptions): ExportPl
   ]
     .filter(Boolean)
     .join(' ')
-  // 文件名按当前账号层级统一命名（与 .dxy 数据文件同构）；表内大标题保留数据维度（专业/班级）供展示。
+  // 文件名按当前账号层级统一命名；表内大标题保留数据维度（专业/班级）供展示。
   const fileName = `${buildExportName(batch, '德育分核算')}.xlsx`
   return { title, fileName, itemCols, totalRows: dimensions.total }
 }

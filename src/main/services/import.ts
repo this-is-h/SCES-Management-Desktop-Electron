@@ -48,7 +48,6 @@ import {
   stageConfirmSlip,
   stageEvidenceFiles
 } from './evidence'
-import { importBatchExchange } from './exchange'
 import { publishApplyStatusReliable } from './status-outbox'
 import { userFacingErrorMessage } from './user-error'
 import type { ImportFileResult } from '../../preload/types'
@@ -60,14 +59,12 @@ type ImportedAssetFile = {
 }
 
 /**
- * 导入一个/多个统一扩展名 `.dyf` 文件：学生申请或管理端数据交换。
- * 通过容器头部的 documentType 路由，逐文件处理，互不影响。
- * overwrite：仅一级管理端交换导入时生效（覆盖已有数据，渲染层已提示）。
+ * 导入一个/多个 `.dyf` 学生申请文件，逐文件处理，互不影响。
+ * （管理端间 .dxy 数据交换文件已随离线分级授权下线移除。）
  */
 export async function importApplyFiles(
   batchId: string,
-  filePaths: string[],
-  options: { overwrite?: boolean } = {}
+  filePaths: string[]
 ): Promise<ImportFileResult[]> {
   assertWritable()
   const batch = getBatch(batchId)
@@ -83,9 +80,7 @@ export async function importApplyFiles(
       // 扩展名白名单 + 大小上限（渲染层路径不可信；异步 readFile 前先校验，避免读大文件阻塞主进程）
       assertReadableFile(filePath, ['.dyf'], MAX_APPLICATION_FILE_BYTES)
       const { header } = await readContainerHeaderFromFile(filePath)
-      if (header.documentType === 'admin-exchange') {
-        results.push(...(await importBatchExchange(batch, filePath, options.overwrite ?? false)))
-      } else if (header.documentType === 'student-application') {
+      if (header.documentType === 'student-application') {
         results.push(await importOneFile(batch, template, filePath))
       } else {
         results.push({

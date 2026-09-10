@@ -463,16 +463,12 @@ export interface DmsApi {
   audit: {
     list(options?: { limit?: number; offset?: number; batchId?: string }): Promise<AuditLog[]>
   }
-  /** 导入统一 .dyf 学生申请/管理端交换文件（通过 documentType 路由）。 */
+  /** 导入 .dyf 学生申请文件。 */
   import: {
-    /** 弹出统一 .dyf 文件选择框，取消返回 null。 */
+    /** 弹出 .dyf 文件选择框，取消返回 null。 */
     pickFiles(): Promise<string[] | null>
-    /** 导入一个或多个 .dyf 文件；overwrite 仅一级导入管理端交换数据时覆盖已有数据。 */
-    run(
-      batchId: string,
-      filePaths: string[],
-      options?: { overwrite?: boolean }
-    ): Promise<ImportFileResult[]>
+    /** 导入一个或多个 .dyf 学生申请文件。 */
+    run(batchId: string, filePaths: string[]): Promise<ImportFileResult[]>
     /** 拖放/选择框拿到的 File 对象 → 本地文件路径（Electron webUtils，拖入导入用）。 */
     getPathForFile(file: unknown): string
     /** 待处理学号冲突列表。 */
@@ -503,16 +499,12 @@ export interface DmsApi {
     /** 调整单个德育明细分（扣分/加分）。 */
     setScore(batchId: string, applyId: string, itemCode: string, finalScore: number): Promise<void>
     /**
-     * 整班确认并导出（issue #4/#5）：二三级先产出 .dyf 数据文件（写盘成功后）再确认锁定，
-     * 取消保存 → 返回 { canceled:true } 且无任何状态变更；一级为汇总终端仅最终确认（path=null）。
+     * 整班最终确认：确认即锁定，状态经 outbox 同步服务端（管理端间 .dxy 交换已下线）。
      */
     confirmBatchExport(batchId: string): Promise<{
       confirmedCount?: number
-      path?: string | null
-      canceled?: boolean
       syncPending?: boolean
     }>
-    /** 撤销整班导出（仅一级，留审计）：confirmed → reviewing，清除班级端审核标记。 */
     /** 手动计算排名（决策 #47）：重算 final_grade 与班排/专排，返回参与排名人数。 */
     computeRanking(batchId: string): Promise<{ rankedCount: number }>
   }
@@ -534,16 +526,6 @@ export interface DmsApi {
     ): Promise<string | null>
     /** 保存图片（data URL → 文件，另存证明材料/确认单），返回路径或 null=取消。 */
     saveImage(fileName: string, dataUrl: string): Promise<string | null>
-    /** 重新导出本级数据 .dyf（issue #5：二级可无限制导出），返回路径或 null=取消。 */
-    batchData(batchId: string): Promise<string | null>
-    onBatchProgress(
-      callback: (progress: {
-        phase: 'prepare' | 'write' | 'finalize'
-        completedFrames: number
-        totalFrames: number
-        writtenBytes: number
-      }) => void
-    ): () => void
   }
   evidence: {
     /** 读证据文件为 data URL（审核详情展示），文件不存在返回 null。 */
@@ -564,5 +546,4 @@ export interface DmsApi {
     /** 订阅主进程推送的检查结果（自动检查或手动检查后）。 */
     onStatus(callback: (payload: UpdateCheckResult | null) => void): void
   }
-  /** 开发者调试（仅服务商：数据库加密后的明文导出通道）。用户界面隐藏，须持服务商票据。 */
 }

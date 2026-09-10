@@ -343,8 +343,8 @@ const rawText = computed(() => {
           color="info"
           variant="soft"
           icon="i-lucide-hourglass"
-          title="管理端导出文件解析即将上线"
-          description="该页将支持上传并解析管理端间导出的数据交换文件（.dyf admin-exchange，三级 → 二级 → 一级汇总），展示学生名单、德育分明细与核对标识。功能开发中，敬请期待。"
+          title="解析功能开发中"
+          description="管理端数据交换文件已随离线分级授权下线；本页当前解析学生端导出的 .dyf 申请文件。更多解析能力开发中，敬请期待。"
         />
       </UPageCard>
     </div>

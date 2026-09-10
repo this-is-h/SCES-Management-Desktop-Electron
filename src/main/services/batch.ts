@@ -373,37 +373,3 @@ export function closeBatch(batchId: string): Promise<Batch> {
   return transitionBatch(batchId, 'closed', 'batch.close')
 }
 
-/** A .dxy file must be based on a table exported after the latest score/list change. */
-export function assertFreshTableExport(batchId: string): void {
-  const batch = getBatch(batchId)
-  if (!batch) throw new Error('批次不存在')
-  if (!batch.rankedAt || (batch.scoresChangedAt && batch.rankedAt < batch.scoresChangedAt)) {
-    throw new Error('排名尚未计算或已经过期，请先按最新数据重新计算排名')
-  }
-  if (!batch.tableExportedAt) {
-    throw new Error('导出德育分数据文件前，请先导出一次公示表格')
-  }
-  if (batch.scoresChangedAt && batch.tableExportedAt < batch.scoresChangedAt) {
-    throw new Error('分数或名单在上次表格导出后发生了变化，请重新计算排名并导出最新表格')
-  }
-}
-
-/** Called only after the XLSX file has been written successfully. */
-export function markTableExported(batchId: string): void {
-  const batch = getBatch(batchId)
-  if (!batch) throw new Error('批次不存在')
-  if (!batch.rankedAt || (batch.scoresChangedAt && batch.rankedAt < batch.scoresChangedAt)) {
-    throw new Error('排名尚未计算或已经过期，不能登记本次表格导出')
-  }
-  const now = Date.now()
-  getDb().prepare('UPDATE batch SET table_exported_at = ?, updated_at = ? WHERE id = ?').run(now, now, batchId)
-  writeAudit({
-    batchId,
-    operator: 'local-admin',
-    role: currentRole(),
-    scope: 'unit',
-    action: 'score-table.export',
-    target: batchId,
-    detail: { exportedAt: now }
-  })
-}

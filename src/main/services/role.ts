@@ -77,7 +77,7 @@ export function studentScopeSql(cols: { grade: string; class: string }): {
 
 /**
  * 数据范围门禁（§5.4/§6）：二三级只能处理「本班/本年级」学生；越权返回拒绝原因，在范围内或一级返回 null。
- * 导入 .dyf 与导入 .dxy 交换文件共用——越权数据必须拒绝，否则落库后被列表/统计/导出的 scope 过滤，
+ * 导入 .dyf 的越权数据必须拒绝，否则落库后被列表/统计/导出的 scope 过滤，
  * 造成「排名算出 N 人、页面与导出 0 人」的存储/展示/导出不一致。
  */
 export function outOfScopeReason(student: { grade?: unknown; className?: unknown }): string | null {

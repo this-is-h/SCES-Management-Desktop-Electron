@@ -47,8 +47,7 @@ const api: DmsApi = {
   },
   import: {
     pickFiles: () => ipcRenderer.invoke('import:pick-files'),
-    run: (batchId, filePaths, options) =>
-      ipcRenderer.invoke('import:run', batchId, filePaths, options),
+    run: (batchId, filePaths) => ipcRenderer.invoke('import:run', batchId, filePaths),
     getPathForFile: (file) =>
       webUtils.getPathForFile(file as Parameters<typeof webUtils.getPathForFile>[0]),
     listConflicts: (batchId) => ipcRenderer.invoke('import:list-conflicts', batchId),
@@ -78,16 +77,7 @@ const api: DmsApi = {
   export: {
     scoreTableXlsx: (batchId, options) =>
       ipcRenderer.invoke('export:score-table-xlsx', batchId, options),
-    saveImage: (fileName, dataUrl) => ipcRenderer.invoke('export:save-image', fileName, dataUrl),
-    batchData: (batchId) => ipcRenderer.invoke('export:batch-data', batchId),
-    onBatchProgress: (callback) => {
-      const listener = (
-        _e: Electron.IpcRendererEvent,
-        progress: Parameters<NonNullable<Parameters<DmsApi['export']['onBatchProgress']>[0]>>[0]
-      ): void => callback(progress)
-      ipcRenderer.on('export:batch-progress', listener)
-      return () => ipcRenderer.removeListener('export:batch-progress', listener)
-    }
+    saveImage: (fileName, dataUrl) => ipcRenderer.invoke('export:save-image', fileName, dataUrl)
   },
   evidence: {
     read: (filePath) => ipcRenderer.invoke('evidence:read', filePath)

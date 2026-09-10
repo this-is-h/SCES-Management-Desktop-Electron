@@ -13,12 +13,10 @@ import { checkForUpdates } from '../services/updater'
 import { getDataDirInfo, setDataDir } from '../services/data-dir'
 import {
   activateBatch,
-  assertFreshTableExport,
   closeBatch,
   createBatch,
   getBatch,
   listBatches,
-  markTableExported,
   toPublicBatch,
   updateBatch
 } from '../services/batch'
@@ -38,12 +36,6 @@ import {
 } from '../services/unit'
 import { importApplyFiles } from '../services/import'
 import { parseStudentDyfFile } from '../services/dyf-parse'
-import {
-  exportBatchExchangeToFile,
-  getBatchExchangeFileName,
-  recordBatchExchangeExport
-} from '../services/exchange'
-import { currentRole } from '../services/role'
 import { correctName, listConflicts, resolveConflict } from '../services/conflict'
 import {
   confirmBatchExport,
@@ -127,7 +119,7 @@ export function registerIpcHandlers(): void {
   // 审计日志
   ipcMain.handle('audit:list', (_e, options) => listAudit(options))
 
-  // M3 导入（.dyf 学生申请文件 / .dxy 管理端数据交换文件，issue #5）
+  // M3 导入（.dyf 学生申请文件）
   ipcMain.handle('import:pick-files', async (e) => {
     const win = BrowserWindow.fromWebContents(e.sender)
     const res = await dialog.showOpenDialog(win!, {
@@ -137,10 +129,8 @@ export function registerIpcHandlers(): void {
     })
     return res.canceled ? null : res.filePaths
   })
-  ipcMain.handle(
-    'import:run',
-    (_e, batchId: string, filePaths: string[], options?: { overwrite?: boolean }) =>
-      importApplyFiles(batchId, filePaths, options ?? {})
+  ipcMain.handle('import:run', (_e, batchId: string, filePaths: string[]) =>
+    importApplyFiles(batchId, filePaths)
   )
   ipcMain.handle('import:list-conflicts', (_e, batchId: string) => listConflicts(batchId))
   ipcMain.handle(
@@ -178,51 +168,10 @@ export function registerIpcHandlers(): void {
     async (_e, batchId: string, applyId: string, itemCode: string, finalScore: number) =>
       setScore(batchId, applyId, itemCode, finalScore)
   )
-  // 整班确认并导出（issue #4/#5）：
-  //  - 三级：先产出 .dxy 数据文件（写盘成功后）再确认锁定；用户取消保存 → 不改任何状态。
-  //  - 二级：产出 .dxy 但不锁定，可继续复核、修改并再次导出。
-  //  - 一级：汇总终端，无数据导出——仅最终确认（不产文件）。
-  ipcMain.handle('apply:batch-export', async (e, batchId: string) => {
-    const role = currentRole()
-    if (role === 'level1') {
-      const r = await confirmBatchExport(batchId)
-      return { confirmedCount: r.confirmedCount, syncPending: r.syncPending, path: null }
-    }
-    assertFreshTableExport(batchId)
-    const batch = getBatch(batchId)
-    if (!batch) throw new Error('批次不存在')
-    const win = BrowserWindow.fromWebContents(e.sender)
-    const res = await dialog.showSaveDialog(win!, {
-      title: '导出本级数据（发送给上级管理员复核）',
-      defaultPath: getBatchExchangeFileName(batch),
-      filters: [{ name: '德育分文件', extensions: ['dyf'] }]
-    })
-    if (res.canceled || !res.filePath) return { canceled: true }
-    await exportBatchExchangeToFile(batch, res.filePath, (progress) => {
-      e.sender.send('export:batch-progress', progress)
-    })
-    recordBatchExchangeExport(batch)
-    if (role === 'level2') return { confirmedCount: 0, path: res.filePath }
+  // 整班最终确认（确认即锁定；状态经 outbox 同步服务端。管理端间 .dxy 数据交换已下线）
+  ipcMain.handle('apply:batch-export', async (_e, batchId: string) => {
     const r = await confirmBatchExport(batchId)
-    return { confirmedCount: r.confirmedCount, syncPending: r.syncPending, path: res.filePath }
-  })
-  // 重新导出数据文件（issue #5：二级可无限制导出）：已确认/已导出批次重新生成 .dxy，不改任何状态。
-  ipcMain.handle('export:batch-data', async (e, batchId: string) => {
-    assertFreshTableExport(batchId)
-    const batch = getBatch(batchId)
-    if (!batch) throw new Error('批次不存在')
-    const win = BrowserWindow.fromWebContents(e.sender)
-    const res = await dialog.showSaveDialog(win!, {
-      title: '重新导出本级数据',
-      defaultPath: getBatchExchangeFileName(batch),
-      filters: [{ name: '德育分文件', extensions: ['dyf'] }]
-    })
-    if (res.canceled || !res.filePath) return null
-    await exportBatchExchangeToFile(batch, res.filePath, (progress) => {
-      e.sender.send('export:batch-progress', progress)
-    })
-    recordBatchExchangeExport(batch)
-    return res.filePath
+    return { confirmedCount: r.confirmedCount, syncPending: r.syncPending, path: null }
   })
   // 决策 #47：手动计算排名（重算 final_grade 与班排/专排，落 ranked_at）
   ipcMain.handle('apply:compute-ranking', (_e, batchId: string) => computeRanking(batchId))
@@ -252,7 +201,6 @@ export function registerIpcHandlers(): void {
       })
       if (res.canceled || !res.filePath) return null
       await writeScoreTableXlsx(batchId, res.filePath, exportOptions)
-      markTableExported(batchId)
       return res.filePath
     }
   )
